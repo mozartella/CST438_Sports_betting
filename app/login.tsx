@@ -1,9 +1,47 @@
-import { Text, View, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, TextInput, StyleSheet, Button, Alert } from 'react-native';
 
 export default function LoginScreen() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [savedUsername, setSavedUsername] = useState('');
+  const [savedPassword, setSavedPassword] = useState('');
+
+  const saveCredentials = () => {
+    setSavedUsername(username);
+    setSavedPassword(password);
+    Alert.alert('Saved', 'Your username and password have been saved.');
+  };
+
+  const login = () => {
+    if (username === savedUsername && password === savedPassword) {
+      Alert.alert('Welcome', 'You are now logged in!');
+    } else {
+      Alert.alert('Error', 'Incorrect username or password.');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Login Screen Pending</Text>
+      <Text style={styles.label}>Username:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter your username"
+        onChangeText={setUsername}
+        value={username}
+      />
+      <Text style={styles.label}>Password:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter your password"
+        secureTextEntry={true}
+        onChangeText={setPassword}
+        value={password}
+      />
+      <View style={styles.buttonContainer}>
+        <Button title="Save" onPress={saveCredentials} />
+        <Button title="Login" onPress={login} />
+      </View>
     </View>
   );
 }
@@ -11,11 +49,26 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#25292e',
+    padding: 20,
     justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
-  text: {
-    color: '#fff',
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#333',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginBottom: 15,
+    borderRadius: 5,
+    backgroundColor: '#fff',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
 });
