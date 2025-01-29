@@ -4,9 +4,9 @@ CREATE TABLE users (
     password TEXT NOT NULL
 );
 
-CREATE TABLE data (
-    data_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    data TEXT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users (id)
-);
+-- CREATE TABLE data (
+--     data_id INTEGER PRIMARY KEY AUTOINCREMENT,
+--     user_id INTEGER NOT NULL,
+--     data TEXT NOT NULL,
+--     FOREIGN KEY (user_id) REFERENCES users (id)
+-- );
