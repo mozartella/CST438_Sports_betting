@@ -2,10 +2,17 @@ import { View, StyleSheet, Dimensions } from "react-native";
 import { Image } from "expo-image";
 import Button from "@/components/Button";
 import AboutScreen from "./about";
+import { useRouter } from "expo-router";
+
+// Documentation notes for routes/ expo-router: 
+//https://reactnavigation.org/docs/route-object/
+//https://reactnavigation.org/docs/use-route/
 
 const PlaceholderImage = require("@/assets/images/Placeholder.jpg");
 
 export default function Index() {
+  // router object that allows navigation functions. In this case push route
+  const router = useRouter(); 
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
@@ -17,8 +24,8 @@ export default function Index() {
         />
       </View>
       <View style={styles.footerContainer}>
-        <Button theme="primary" label="Login" />
-        <Button label="Create Account" />
+      <Button label="View NBA Stats" onPress={() => router.push("/nba-stats-view")} />
+
       </View>
     </View>
   );
