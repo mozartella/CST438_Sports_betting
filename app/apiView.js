@@ -9,9 +9,9 @@ const App = () => {
   const [data, setData] = useState([]);
   const [jsonResponse, setJsonResponse] = useState(null);
 
-  const getNBAStats = async () => {
+  const apiCall = async (endpoint) => {
     try {
-      const response = await fetch('https://api-nba-v1.p.rapidapi.com/teams', {
+      const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
           'x-rapidapi-key': 'f48a5921f5msh580809ba8c9e6cfp181a8ajsn545d715d6844',
@@ -29,7 +29,23 @@ const App = () => {
   };
 
   useEffect(() => {
-    getNBAStats(); 
+    // Teams Endpoint (Where I started)
+    const endpointTeams = 'https://api-nba-v1.p.rapidapi.com/teams';
+
+    //-------------------------Useful Endpoints --------------------------------------
+
+    // Endpoint to show the current standings of Nba Teams
+    const endpointStandings = 'https://api-nba-v1.p.rapidapi.com/standings?league=standard&season=2024';
+
+    // Schedule Endpoint (A LOT OF GOOD INFORMATION)
+    const endpointSchedule = 'https://api-nba-v1.p.rapidapi.com/games?season=2024&team=1' ;
+
+    // endpoint for sampling
+    const endpoint = 'https://api-nba-v1.p.rapidapi.com/standings?league=standard&season=2024';
+
+
+
+    apiCall(endpointSchedule); 
   }, []);
 
   return (

@@ -24,7 +24,7 @@ export default function Index() {
         />
       </View>
       <View style={styles.footerContainer}>
-      <Button label="View NBA Stats" onPress={() => router.push("/nba-stats-view")} />
+      <Button label="View API Results" onPress={() => router.push("/apiView")} />
 
       </View>
     </View>
