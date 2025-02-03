@@ -8,6 +8,7 @@ const App = () => {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [jsonResponse, setJsonResponse] = useState(null);
+  const [scheduleData, setScheduleData] = useState([]);
 
   const apiCall = async (endpoint) => {
     try {
@@ -27,6 +28,25 @@ const App = () => {
       setLoading(false); 
     }
   };
+
+  // Working on this function
+  const getTeamSchedule = async (teamId) => {
+    setLoading(true);
+
+    // Attempting to gather a teams schedule by Date
+    const todaysDate = new Date().toISOString().split('T')[0]; 
+    const endpointSchedule = `https://api-nba-v1.p.rapidapi.com/games?team=${teamId}&date=${todaysDate}`;
+    const scheduleJson = await apiCall(endpointSchedule);
+
+    //Had to add these conditions because of errors
+    if (scheduleJson && scheduleJson.response) {
+      setScheduleData(scheduleJson.response); // Set the team's schedule
+    }
+    //stops the dang loading spinner from going forever
+    setLoading(false);
+  };
+
+
 
   useEffect(() => {
     // Teams Endpoint (Where I started)
@@ -50,22 +70,23 @@ const App = () => {
 
     //endpoint for Games per Date (Note the format of date)
 
-    const endpointGamesByDate = 'https://api-nba-v1.p.rapidapi.com/games?date=2022-02-12';
+    const endpointGamesByDate = 'https://api-nba-v2.p.rapidapi.com/games?date=2022-02-12';
 
     //endpoint for Teams by ID (If we log all team ID's that would be helpful)
-    const endpointTeamsByID = 'https://api-nba-v1.p.rapidapi.com/teams?id=1';
+    const endpointTeamsByID = 'https://api-nba-v2.p.rapidapi.com/teams?id=1';
 
     //endpoint for team stats
     const endpointTeamStats = "https://v2.nba.api-sports.io/teams/statistics?season=2024&id=1"
 
     //--------------------------------------------------------------------------------
 
-    // endpoint for sampling
-    const endpoint = 'https://api-nba-v1.p.rapidapi.com/standings?league=standard&season=2024';
+    // endpoint for sampling (Working on crafting the perfect endpoint)
+    const endpoint = 'https://api-nba-v2.p.rapidapi.com/games?date=2025-02-05';
 
 
 
-    apiCall(endpointSchedule); 
+    apiCall(endpoint); 
+  
   }, []);
 
   return (
