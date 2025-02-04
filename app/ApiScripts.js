@@ -29,24 +29,20 @@ const App = () => {
     }
   };
 
-  // Working on this function
-  const getTeamSchedule = async (teamId) => {
-    setLoading(true);
+  // Function to filter games by date (Sample Still trying to figure this out)
+  // https://www.w3schools.com/jsref/jsref_filter.asp
+  //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+  
+  function filterGamesByDate(apiResponse, targetDate) {
+    if (!apiResponse || !apiResponse.response) return [];
+    return apiResponse.response.filter(game => {
+      let gameDate = game.date.start;
+      console.log(gameDate);
+       
+      return gameDate && gameDate.includes(targetDate);
+    });
 
-    // Attempting to gather a teams schedule by Date
-    const todaysDate = new Date().toISOString().split('T')[0]; 
-    const endpointSchedule = `https://api-nba-v1.p.rapidapi.com/games?team=${teamId}&date=${todaysDate}`;
-    const scheduleJson = await apiCall(endpointSchedule);
-
-    //Had to add these conditions because of errors
-    if (scheduleJson && scheduleJson.response) {
-      setScheduleData(scheduleJson.response); // Set the team's schedule
-    }
-    //stops the dang loading spinner from going forever
-    setLoading(false);
-  };
-
-
+  }
 
   useEffect(() => {
     // Teams Endpoint (Where I started)
@@ -81,21 +77,22 @@ const App = () => {
     //--------------------------------------------------------------------------------
 
     // endpoint for sampling (Working on crafting the perfect endpoint)
-    const endpoint = 'https://api-nba-v2.p.rapidapi.com/games?date=2025-02-05';
-
-
-
+    const endpoint = 'https://api-nba-v1.p.rapidapi.com/games?season=2024&team=1';
+   
+   
     apiCall(endpoint); 
-  
   }, []);
 
+
+  
   return (
     <View style={{ flex: 1, padding: 24 }}>
     {isLoading ? (
       <ActivityIndicator /> 
     ) : (
       <ScrollView>
-        <Text>{JSON.stringify(jsonResponse, null, 2)}</Text> 
+        <Text>{JSON.stringify(jsonResponse, null, 2)}</Text>
+         
       </ScrollView>
     )}
   </View>
