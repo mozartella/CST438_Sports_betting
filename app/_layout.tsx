@@ -9,7 +9,7 @@ export default function RootLayout() {
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
-      <Stack.Screen name = "apiView" options ={{title: "NBA Stats"}} />
+      <Stack.Screen name = "ApiScripts" options ={{title: "NBA Stats"}} />
     </Stack>
   );
 }

@@ -6,9 +6,7 @@ import {ActivityIndicator, FlatList, Text, View,ScrollView} from 'react-native';
 
 const App = () => {
   const [isLoading, setLoading] = useState(true);
-  const [data, setData] = useState([]);
   const [jsonResponse, setJsonResponse] = useState(null);
-  const [scheduleData, setScheduleData] = useState([]);
 
   const apiCall = async (endpoint) => {
     try {
@@ -33,17 +31,6 @@ const App = () => {
   // https://www.w3schools.com/jsref/jsref_filter.asp
   //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
   
-  function filterGamesByDate(apiResponse, targetDate) {
-    if (!apiResponse || !apiResponse.response) return [];
-    return apiResponse.response.filter(game => {
-      let gameDate = game.date.start;
-      console.log(gameDate);
-       
-      return gameDate && gameDate.includes(targetDate);
-    });
-
-  }
-
   useEffect(() => {
     // Teams Endpoint (Where I started)
     const endpointTeams = 'https://api-nba-v1.p.rapidapi.com/teams';
