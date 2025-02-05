@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet } from 'expo-image';
+import { ImageBackground, } from 'expo-image';
 import React from 'react';
 
 export default function teamSelectionScreen() {
@@ -7,8 +7,3 @@ export default function teamSelectionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-    background: {
-        flex: 1
-    }
-})
