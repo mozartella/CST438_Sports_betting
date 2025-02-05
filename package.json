@@ -18,7 +18,11 @@
     "@expo/vector-icons": "^14.0.2",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
+<<<<<<< HEAD
     "@react-navigation/stack": "^7.1.1",
+=======
+    "better-sqlite3": "^11.8.1",
+>>>>>>> 0f2eaadf0a9ccc1026b3bf4d1551d2369c1f959e
     "expo": "^52.0.28",
     "expo-blur": "~14.0.3",
     "expo-constants": "~17.0.4",

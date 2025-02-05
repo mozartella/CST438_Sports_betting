@@ -2892,6 +2892,14 @@ better-opn@~3.0.2:
   dependencies:
     open "^8.0.4"
 
+better-sqlite3@^11.8.1:
+  version "11.8.1"
+  resolved "https://registry.npmjs.org/better-sqlite3/-/better-sqlite3-11.8.1.tgz"
+  integrity sha512-9BxNaBkblMjhJW8sMRZxnxVTRgbRmssZW0Oxc1MPBTfiR+WW21e2Mk4qu8CzrcZb1LwPCnFsfDEzq+SNcBU8eg==
+  dependencies:
+    bindings "^1.5.0"
+    prebuild-install "^7.1.1"
+
 big-integer@1.6.x:
   version "1.6.52"
   resolved "https://registry.npmjs.org/big-integer/-/big-integer-1.6.52.tgz"
