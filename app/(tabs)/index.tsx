@@ -24,7 +24,7 @@ export default function Index() {
         />
       </View>
       <View style={styles.footerContainer}>
-      <Button label="View API Results" onPress={() => router.push("/ApiScripts")} />
+      <Button label="View API Results" onPress={() => router.push('/apiCallView')} />
 
       </View>
     </View>
