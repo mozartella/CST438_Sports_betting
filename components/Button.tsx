@@ -8,6 +8,7 @@ type Props = {
 };
 
 export default function Button({ label, theme, onPress }: Props) {
+
   if (theme === 'primary') {
     return (
       <View
@@ -17,6 +18,7 @@ export default function Button({ label, theme, onPress }: Props) {
         ]}>
         <Pressable
           style={[styles.button, { backgroundColor: '#fff' }]}
+
           onPress={onPress}> {/* Use the passed onPress here */}
           <FontAwesome name="user-circle" size={18} color="#25292e" style={styles.buttonIcon} />
           <Text style={[styles.buttonLabel, { color: '#25292e' }]}>{label}</Text>
@@ -27,7 +29,9 @@ export default function Button({ label, theme, onPress }: Props) {
 
   return (
     <View style={styles.buttonContainer}>
+
       <Pressable style={styles.button} onPress={onPress}> {/* Use the passed onPress here */}
+
         <Text style={styles.buttonLabel}>{label}</Text>
       </Pressable>
     </View>

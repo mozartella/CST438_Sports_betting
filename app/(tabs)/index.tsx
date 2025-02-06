@@ -12,7 +12,7 @@ const PlaceholderImage = require('@/assets/images/Placeholder.jpg');
 // Define the type for the navigation prop
 type IndexScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-export default function Index() {
+const Index = () => {
   const navigation = useNavigation<IndexScreenNavigationProp>(); // Use the typed navigation hook
 
   const handleCreateAccount = () => {
@@ -34,7 +34,7 @@ export default function Index() {
       </View>
     </View>
   );
-}
+};
 
 const { width, height } = Dimensions.get('window');
 
@@ -57,3 +57,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default Index;
