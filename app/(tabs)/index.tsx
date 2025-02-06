@@ -1,3 +1,4 @@
+
 // Index.tsx
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
@@ -7,12 +8,12 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navagation/types'; // Import navigation types
 
+
 const PlaceholderImage = require('@/assets/images/Placeholder.jpg');
 
 // Define the type for the navigation prop
 type IndexScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
-export default function Index() {
   const navigation = useNavigation<IndexScreenNavigationProp>(); // Use the typed navigation hook
 
   const handleCreateAccount = () => {
@@ -29,8 +30,10 @@ export default function Index() {
         />
       </View>
       <View style={styles.footerContainer}>
+
         <Button theme="primary" label="Login" />
         <Button label="Create Account" onPress={handleCreateAccount} />
+
       </View>
     </View>
   );
