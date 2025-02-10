@@ -73,6 +73,7 @@ export const callGamesByDate = async (startDate, endDate, teamID) => {
 
       // I think I could make call Teams redundant with this stuff at some point.
       .map((game) => ({
+        id: game.id,
         date: new Date(game.date.start),
         homeTeam: {
           id: game.teams.home.id,
@@ -81,6 +82,7 @@ export const callGamesByDate = async (startDate, endDate, teamID) => {
           logo: game.teams.home.logo,
         },
         awayTeam: {
+          id: game.id,
           id: game.teams.visitors.id,
           name: game.teams.visitors.name,
           nickname: game.teams.visitors.nickname,
