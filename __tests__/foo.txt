@@ -1,0 +1,85 @@
+const {
+    verifyUserLogin,
+    isUsernameAvailable,
+    getUserID,
+    updatePassword
+} = require('../database/userDB');  // Import userDB.js
+
+async function runTests() {
+    // Test 1: verifyUserLogin with correct credentials
+    let result = await verifyUserLogin('testUser1', '1234');
+    console.log('Test 1 - verifyUserLogin with correct credentials:');
+    if (result === true) {
+        console.log('Correct: testUser1 with password 1234');
+    } else {
+        console.log('Incorrect: testUser1 with password 1234');
+    }
+
+    // Test 2: verifyUserLogin with incorrect password
+    result = await verifyUserLogin('testUser1', '1233');
+    console.log('Test 2 - verifyUserLogin with incorrect credentials:');
+    if (result === false) {
+        console.log('Correct: testUser1 with password 1233');
+    } else {
+        console.log('Incorrect: testUser1 with password 1233');
+    }
+
+    // Test 3: isUsernameAvailable for an existing username
+    result = await isUsernameAvailable('testUser1');
+    console.log('Test 3 - isUsernameAvailable for existing user testUser1:');
+    if (result === false) {
+        console.log('Correct: testUser1 exists');
+    } else {
+        console.log('Incorrect: testUser1 exists');
+    }
+
+    // Test 4: isUsernameAvailable for a non-existing username
+    result = await isUsernameAvailable('testUser2');
+    console.log('Test 4 - isUsernameAvailable for non-existing user testUser2:');
+    if (result === true) {
+        console.log('Correct: testUser2 does not exist');
+    } else {
+        console.log('Incorrect: testUser2 does not exist');
+    }
+
+    // Test 5: getUserID for testUser1
+    result = await getUserID('testUser1');
+    console.log('Test 5 - getUserID for testUser1:');
+    if (result === 1) {
+        console.log('Correct: testUser1 has ID 1');
+    } else {
+        console.log('Incorrect: testUser1 has ID 1');
+    }
+
+    // Test 6: getUserID for testUser2
+    result = await getUserID('testUser2');
+    console.log('Test 6 - getUserID for testUser2:');
+    if (result === null) {
+        console.log('Correct: testUser2 does not exist');
+    } else {
+        console.log('Incorrect: testUser2 does not exist');
+    }
+
+    // Test 7: updatePassword and verify login with new password
+    await updatePassword('testUser1', '1234', '12345');
+    result = await verifyUserLogin('testUser1', '12345');
+    console.log('Test 7 - updatePassword and verify with new password:');
+    if (result === true) {
+        console.log('Correct: testUser1 password updated to 12345');
+    } else {
+        console.log('Incorrect: testUser1 password updated to 12345');
+    }
+
+    // Test 8: updatePassword and verify login with old password
+    await updatePassword('testUser1', '12345', '1234');
+    result = await verifyUserLogin('testUser1', '12345');
+    console.log('Test 8 - updatePassword and verify with old password:');
+    if (result === false) {
+        console.log('Correct: testUser1 password reverted back to 1234');
+    } else {
+        console.log('Incorrect: testUser1 password reverted back to 1234');
+    }
+}
+
+// Run all tests
+runTests();

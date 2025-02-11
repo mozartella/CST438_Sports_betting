@@ -10,14 +10,14 @@ function insertUser(username, password) {
 }
 
 // varify login info
-function varifyUserLogin(username, password) {
+function verifyUserLogin(username, password) {
     const sql = `
         SELECT password
         FROM user
         WHERE username = ?;
     `;
     const user = db.prepare(sql).get(username);
-    if (user && user.password == password) {
+    if ((user) && user.password == password) {
         return true;
     } else {
         return false;
@@ -42,7 +42,7 @@ function isUsernameAvailable(username) {
         WHERE username = ?;
     `;
     const user = db.prepare(sql).get(username);
-    if (user != null) {
+    if (user) {
         return false;
     } else {
         return true;
@@ -65,12 +65,17 @@ function getUserID(username) {
         FROM user
         WHERE username = ?;
     `;
-    return db.prepare(sql).get(username)?.id;
+    const user = db.prepare(sql).get(username);
+    if (user) {
+        return user.id;
+    } else {
+        return null;
+    }
 }
 
 module.exports = {
     insertUser,
-    varifyUserLogin,
+    verifyUserLogin,
     updatePassword,
     isUsernameAvailable,
     removeUser,

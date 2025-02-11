@@ -80,8 +80,12 @@ function getTeamID(team_name) {
         FROM team
         WHERE team_name = ?
     `;
-    let team = db.prepare(sql).get(team_name);
-    return team.team_id;
+    const team = db.prepare(sql).get(team_name);
+    if (team) {
+        return team.team_id;
+    } else {
+        return null;
+    }
 }
 
 // remove selected team from favorite 

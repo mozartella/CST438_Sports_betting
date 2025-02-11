@@ -1,15 +1,17 @@
-const db = require('better-sqlite3')('database.db');
+//const db = require('better-sqlite3')('database.db');
+const path = require('path');
+const db = require('better-sqlite3')(path.join(__dirname, 'database.db'));
 
 function createTable() {
     const sql1 = `
-        CREATE TABLE user (
+        CREATE TABLE IF NOT EXISTS user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL
         );
     `;
     const sql2 = `
-        CREATE TABLE team (
+        CREATE TABLE IF NOT EXISTS team (
             team_id INTEGER PRIMARY KEY,
             team_name TEXT NOT NULL,
             nickname TEXT NOT NULL,
@@ -17,7 +19,7 @@ function createTable() {
         );
     `; 
     const sql3 = `
-        CREATE TABLE favorite (
+        CREATE TABLE IF NOT EXISTS favorite (
             team_id INTEGER NOT NULL,
             user_id INTEGER NOT NULL,
             PRIMARY KEY (user_id, team_id),
