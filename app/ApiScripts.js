@@ -82,7 +82,6 @@ export const callGamesByDate = async (startDate, endDate, teamID) => {
           logo: game.teams.home.logo,
         },
         awayTeam: {
-          id: game.id,
           id: game.teams.visitors.id,
           name: game.teams.visitors.name,
           nickname: game.teams.visitors.nickname,
