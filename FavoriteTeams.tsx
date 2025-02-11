@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Image, // ✅ Import Image for displaying logos
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { callTeams } from "../ApiScripts"; 
@@ -30,7 +31,7 @@ const FavoriteTeams = () => {
       setLoading(true);
       try {
         process.env.RAPIDAPI_KEY = "f48a5921f5msh580809ba8c9e6cfp181a8ajsn545d715d6844"; // 🔥 Set key before calling API
-        console.log("🔑 API Key being used:", process.env.RAPIDAPI_KEY);
+        console.log(" API Key being used:", process.env.RAPIDAPI_KEY);
   
         const teamData = await callTeams();
         
@@ -48,8 +49,7 @@ const FavoriteTeams = () => {
   
     fetchTeams();
   }, []);
-  
-  
+
   const toggleTeamSelection = (teamId: string) => {
     let updatedTeams = [...selectedTeams];
   
@@ -68,7 +68,6 @@ const FavoriteTeams = () => {
   
     console.log(" Updated favorite teams stored:", updatedTeams);
   };
-  
 
   if (loading) return <ActivityIndicator style={styles.loader} size="large" color="#0000ff" />;
 
@@ -89,7 +88,11 @@ const FavoriteTeams = () => {
               ]}
               onPress={() => toggleTeamSelection(item.id)}
             >
-              <Text style={styles.teamText}>{item.name}</Text>
+              <View style={styles.teamContainer}>
+                {/* ✅ Add Image for Logo */}
+                <Image source={{ uri: item.logo }} style={styles.logo} />
+                <Text style={styles.teamText}>{item.name}</Text>
+              </View>
             </TouchableOpacity>
           )}
         />
@@ -109,6 +112,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: 5,
+    flexDirection: "row", // ✅ Make sure text and logo align properly
+    alignItems: "center",
+  },
+  teamContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logo: { // ✅ Styling for logos
+    width: 40, 
+    height: 40, 
+    marginRight: 10,
+    resizeMode: "contain",
   },
   selectedTeam: { backgroundColor: "#87CEFA" },
   teamText: { fontSize: 18 },
