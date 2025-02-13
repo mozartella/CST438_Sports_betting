@@ -1,7 +1,10 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navagation/types"; 
+import React, { useState } from 'react';
+import { ActivityIndicator } from 'react-native';
+import { Text, View, TextInput, StyleSheet, Button, Alert, Dimensions, ImageBackground } from 'react-native';
+import loginPic from '../../assets/images/loginPic2.jpg';
+
 
 const LoginScreen = () => {
   const [username, setUsername] = useState("");
@@ -45,38 +48,53 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Username:</Text>
-      <TextInput
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Enter username"
-        style={styles.input}
-      />
 
-      <Text style={styles.label}>Password:</Text>
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Enter password"
-        secureTextEntry
-        style={styles.input}
-      />
+    <ImageBackground source={loginPic} style={styles.container} resizeMode="cover">
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Username:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your username"
+          onChangeText={setUsername}
+          value={username}
+        />
+        <Text style={styles.label}>Password:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your password"
+          secureTextEntry={true}
+          onChangeText={setPassword}
+          value={password}
+        />
 
-      {message ? <Text style={styles.message}>{message}</Text> : null}
+        {message ? <Text style={styles.message}>{message}</Text> : null}
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
-      ) : (
-        <Button title="LOGIN" onPress={handleLogin} color="green" />
-      )}
-    </View>
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <Button title="LOGIN" onPress={handleLogin} color="green" />
+        )}
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, justifyContent: "center", alignItems: "center" },
-  label: { fontSize: 16, fontWeight: "bold", marginBottom: 5 },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  formContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background for the form
+    padding: 20,
+    borderRadius: 10,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: '#333',
+  },
   input: {
     width: "80%",
     padding: 10,
@@ -84,6 +102,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   message: { fontSize: 14, color: "red", marginBottom: 10 },
 });
