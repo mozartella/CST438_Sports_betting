@@ -1,44 +1,60 @@
-// AccountCreation.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 
-export default function AccountCreation() {
-  // State to store the values of the form fields
+export default function AccountCreation({ navigation }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const[usersTeam1, setTeam1] = useState('');
-  const[usersTeam2, setTeam2] = useState('');
+  const [usersTeam1, setTeam1] = useState('');
+  const [usersTeam2, setTeam2] = useState('');
 
-
-  // Handle account creation logic
-  const handleCreateAccount = () => {
+  // Handle account creation with API logic
+  const handleCreateAccount = async () => {
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match!');
       return;
     }
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !usersTeam1 || !usersTeam2) {
       Alert.alert('Error', 'Please fill in all fields!');
       return;
     }
 
-    if(!usersTeam1 || !usersTeam2) {
-        Alert.alert('Error' , 'Please select your teams!');
-        return;
-    }
+    try {
+      const response = await fetch('http://10.0.2.2:8082/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          team1: usersTeam1,
+          team2: usersTeam2,
+        }),
+      });
 
-    // Simulate account creation success (replace this with actual API logic)
-    Alert.alert('Account Created', `Welcome, ${username}!`);
-    
-    // Reset form fields (optional)
-    setUsername('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-    setTeam1('');
-    setTeam2('');
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Success', 'Account created successfully!');
+        setUsername('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setTeam1('');
+        setTeam2('');
+
+        // Navigate to Login Page
+        navigation.navigate('Login');
+
+      } else {
+        Alert.alert('Error', data.error || 'Failed to create account.');
+      }
+    } catch (error) {
+      console.error('Error creating account:', error);
+      Alert.alert('Network Error', 'Could not connect to the server.');
+    }
   };
 
   return (
@@ -81,7 +97,6 @@ export default function AccountCreation() {
         placeholder="Team 1"
         value={usersTeam1}
         onChangeText={setTeam1}
-        secureTextEntry
       />
 
       <TextInput
@@ -89,14 +104,13 @@ export default function AccountCreation() {
         placeholder="Team 2"
         value={usersTeam2}
         onChangeText={setTeam2}
-        secureTextEntry
       />
 
       <Button title="Create Account" onPress={handleCreateAccount} />
 
       <View style={styles.footer}>
         <Text>Already have an account? </Text>
-        <Button title="Login" onPress={() => alert('Navigate to Login screen')} />
+        <Button title="Login" onPress={() => navigation.navigate('Login')} />
       </View>
     </View>
   );
@@ -127,4 +141,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-

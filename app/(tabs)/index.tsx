@@ -16,7 +16,7 @@ const Index = () => {
   const navigation = useNavigation<IndexScreenNavigationProp>(); // Use the typed navigation hook
 
   const handleCreateAccount = () => {
-    navigation.navigate('AccountCreation'); // Now TypeScript knows the 'CreateAccount' screen
+    navigation.navigate('CreateAccount'); // Now TypeScript knows the 'CreateAccount' screen
   };
 
   return (

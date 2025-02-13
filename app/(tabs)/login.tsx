@@ -1,23 +1,46 @@
-import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, Button, Alert } from 'react-native';
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, StyleSheet, ActivityIndicator } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "../navagation/types"; 
 
-export default function LoginScreen() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [savedUsername, setSavedUsername] = useState('');
-  const [savedPassword, setSavedPassword] = useState('');
+const LoginScreen = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState(""); 
+  const [loading, setLoading] = useState(false); // Add loading state
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
 
-  const saveCredentials = () => {
-    setSavedUsername(username);
-    setSavedPassword(password);
-    Alert.alert('Saved', 'Your username and password have been saved.');
-  };
+  const handleLogin = async () => {
+    setMessage("");
+    setLoading(true); // Show loading indicator
 
-  const login = () => {
-    if (username === savedUsername && password === savedPassword) {
-      Alert.alert('Welcome', 'You are now logged in!');
-    } else {
-      Alert.alert('Error', 'Incorrect username or password.');
+    //"http://10.0.2.2:8082"; // Android emulator
+    //"http://localhost:8082/login";
+    
+    try {
+      const response = await fetch("http://10.0.2.2:8082/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setMessage(` Welcome back, ${username}!`);
+        
+        setTimeout(() => {
+          setLoading(false); // Hide loading indicator
+          navigation.navigate("Home"); 
+        }, 500);
+
+      } else {
+        setMessage(` Error: ${data.error}`);
+        setLoading(false); // Hide loading indicator
+      }
+    } catch (error) {
+      setMessage(" Network error. Try again.");
+      setLoading(false); // Hide loading indicator
+      console.error("Login error:", error);
     }
   };
 
@@ -25,50 +48,44 @@ export default function LoginScreen() {
     <View style={styles.container}>
       <Text style={styles.label}>Username:</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Enter your username"
-        onChangeText={setUsername}
         value={username}
+        onChangeText={setUsername}
+        placeholder="Enter username"
+        style={styles.input}
       />
+
       <Text style={styles.label}>Password:</Text>
       <TextInput
-        style={styles.input}
-        placeholder="Enter your password"
-        secureTextEntry={true}
-        onChangeText={setPassword}
         value={password}
+        onChangeText={setPassword}
+        placeholder="Enter password"
+        secureTextEntry
+        style={styles.input}
       />
-      <View style={styles.buttonContainer}>
-        <Button title="Save" onPress={saveCredentials} />
-        <Button title="Login" onPress={login} />
-      </View>
+
+      {message ? <Text style={styles.message}>{message}</Text> : null}
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <Button title="LOGIN" onPress={handleLogin} color="green" />
+      )}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#333',
-  },
+  container: { flex: 1, padding: 20, justifyContent: "center", alignItems: "center" },
+  label: { fontSize: 16, fontWeight: "bold", marginBottom: 5 },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    width: "80%",
     padding: 10,
-    marginBottom: 15,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
     borderRadius: 5,
-    backgroundColor: '#fff',
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
+  message: { fontSize: 14, color: "red", marginBottom: 10 },
 });
+
+export default LoginScreen;

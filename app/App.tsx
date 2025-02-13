@@ -1,22 +1,35 @@
-// App.tsx (or wherever your navigation is set up)
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import Index from '../app/(tabs)/index'; // Your main screen
-import AccountCreation from './AccountCreation'; // The account creation screen
-import { RootStackParamList } from '../app/navagation/types'; // Navigation types
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-const Stack = createStackNavigator<RootStackParamList>(); // Typing the navigator
+import LoginScreen from "../app/(tabs)/login";
+import FavoriteTeams from "../app/(tabs)/FavoriteTeams";
+import UpcomingGames from "../app/(tabs)/UpcomingGames";
+import AccountCreation from "./(tabs)/AccountCreation"; // Ensure correct path
 
-function App() {
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+const Tabs = () => {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="FavoriteTeams" component={FavoriteTeams} />
+      <Tab.Screen name="UpcomingGames" component={UpcomingGames} />
+    </Tab.Navigator>
+  );
+};
+
+const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={Index} />
-        <Stack.Screen name="AccountCreation" component={AccountCreation} /> {/* Ensure this is the correct screen name */}
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="AcoountCreation" component={AccountCreation} /> 
+        <Stack.Screen name="Home" component={Tabs} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-}
+};
 
 export default App;
