@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Text, View, TextInput, StyleSheet, Button, Alert } from 'react-native';
+import { Text, View, TextInput, StyleSheet, Button, Alert, Dimensions, ImageBackground } from 'react-native';
+import loginPic from '../../assets/images/loginPic2.jpg';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -22,36 +23,42 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Username:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your username"
-        onChangeText={setUsername}
-        value={username}
-      />
-      <Text style={styles.label}>Password:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your password"
-        secureTextEntry={true}
-        onChangeText={setPassword}
-        value={password}
-      />
-      <View style={styles.buttonContainer}>
-        <Button title="Save" onPress={saveCredentials} />
-        <Button title="Login" onPress={login} />
+    <ImageBackground source={loginPic} style={styles.container} resizeMode="cover">
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Username:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your username"
+          onChangeText={setUsername}
+          value={username}
+        />
+        <Text style={styles.label}>Password:</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your password"
+          secureTextEntry={true}
+          onChangeText={setPassword}
+          value={password}
+        />
+        <View style={styles.buttonContainer}>
+          <Button title="Save" onPress={saveCredentials} />
+          <Button title="Login" onPress={login} />
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
+  },
+  formContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background for the form
+    padding: 20,
+    borderRadius: 10,
   },
   label: {
     fontSize: 16,

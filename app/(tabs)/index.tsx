@@ -1,4 +1,3 @@
-// Index.tsx
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
@@ -6,6 +5,7 @@ import Button from '@/components/Button';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navagation/types'; // Import navigation types
+import loginPicture from '../../assets/images/loginPic.jpg';
 
 const PlaceholderImage = require('@/assets/images/Placeholder.jpg');
 
@@ -15,21 +15,27 @@ type IndexScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>
 const Index = () => {
   const navigation = useNavigation<IndexScreenNavigationProp>(); // Use the typed navigation hook
 
+  // Function to navigate to the login screen
+  const handleLogin = () => {
+    navigation.navigate('login'); // Navigate to the Login screen
+  };
+
+  // Function to navigate to the account creation screen
   const handleCreateAccount = () => {
-    navigation.navigate('AccountCreation'); // Now TypeScript knows the 'CreateAccount' screen
+    navigation.navigate('AccountCreation'); // Navigate to the CreateAccount screen
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         <Image
-          source={PlaceholderImage}
+          source={loginPicture}
           style={styles.image}
-          resizeMode="contain"
+          resizeMode="cover"
         />
       </View>
       <View style={styles.footerContainer}>
-        <Button theme="primary" label="Login" />
+        <Button theme="primary" label="Login" onPress={handleLogin} /> {/* Add onPress to navigate */}
         <Button label="Create Account" onPress={handleCreateAccount} />
       </View>
     </View>
