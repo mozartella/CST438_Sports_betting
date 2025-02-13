@@ -1,6 +1,6 @@
-// AccountCreation.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ImageBackground } from 'react-native';
+import accountPic from '../assets/images/accountCreationPic.jpg'; // Your background image
 
 export default function AccountCreation() {
   // State to store the values of the form fields
@@ -8,9 +8,8 @@ export default function AccountCreation() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const[usersTeam1, setTeam1] = useState('');
-  const[usersTeam2, setTeam2] = useState('');
-
+  const [usersTeam1, setTeam1] = useState('');
+  const [usersTeam2, setTeam2] = useState('');
 
   // Handle account creation logic
   const handleCreateAccount = () => {
@@ -24,9 +23,9 @@ export default function AccountCreation() {
       return;
     }
 
-    if(!usersTeam1 || !usersTeam2) {
-        Alert.alert('Error' , 'Please select your teams!');
-        return;
+    if (!usersTeam1 || !usersTeam2) {
+      Alert.alert('Error', 'Please select your teams!');
+      return;
     }
 
     // Simulate account creation success (replace this with actual API logic)
@@ -42,63 +41,63 @@ export default function AccountCreation() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Create Account</Text>
+    <ImageBackground source={accountPic} style={styles.container} resizeMode="cover">
+      <View style={styles.formContainer}>
+        <Text style={styles.heading}>Create Account</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Team 1"
-        value={usersTeam1}
-        onChangeText={setTeam1}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Team 1"
+          value={usersTeam1}
+          onChangeText={setTeam1}
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Team 2"
-        value={usersTeam2}
-        onChangeText={setTeam2}
-        secureTextEntry
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Team 2"
+          value={usersTeam2}
+          onChangeText={setTeam2}
+        />
 
-      <Button title="Create Account" onPress={handleCreateAccount} />
+        <Button title="Create Account" onPress={handleCreateAccount} />
 
-      <View style={styles.footer}>
-        <Text>Already have an account? </Text>
-        <Button title="Login" onPress={() => alert('Navigate to Login screen')} />
+        <View style={styles.footer}>
+          <Text>Already have an account? </Text>
+          <Button title="Login" onPress={() => alert('Navigate to Login screen')} />
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -106,7 +105,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+  },
+  formContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent background for form
     padding: 16,
+    borderRadius: 10,
+    marginHorizontal: 20,
   },
   heading: {
     fontSize: 24,
@@ -127,4 +132,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
