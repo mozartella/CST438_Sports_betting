@@ -46,7 +46,7 @@ const UpcomingGames = () => {
         let allGames: Game[] = [];
         for (const teamID of teamIDs) {
           console.log(`📡 Calling API for games of team: ${teamID}`);
-          const teamGames = await callGamesByDate("2024-02-01", "2024-03-10", teamID);
+          const teamGames = await callGamesByDate("2025-02-01", "2025-03-10", teamID);
   
           console.log(`📡 Full API Response for Team ${teamID}:`, teamGames); //  Log entire response
   

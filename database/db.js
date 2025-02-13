@@ -1,7 +1,14 @@
-//const db = require('better-sqlite3')('database.db');
+const express = require('express');
 const path = require('path');
 const db = require('better-sqlite3')(path.join(__dirname, 'database.db'));
 
+const app = express();
+const PORT = 3000;
+
+// Middleware to parse JSON
+app.use(express.json());
+
+// Initialize database tables
 function createTable() {
     const sql1 = `
         CREATE TABLE IF NOT EXISTS user (
@@ -32,4 +39,15 @@ function createTable() {
     db.prepare(sql3).run();
 }
 
-module.exports = { db, createTable };
+createTable();
+
+// Test route
+app.get('/', (req, res) => {
+    res.send('Server is running!');
+});
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
+
