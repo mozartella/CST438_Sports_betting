@@ -6,6 +6,7 @@ import Index from '../app/(tabs)/index'; // Your main screen
 import LoginScreen from './(tabs)/login';
 import AccountCreation from './AccountCreation'; // The account creation screen
 import { RootStackParamList } from '../app/navagation/types'; // Navigation types
+import FavoriteTeams from './(tabs)/favoriteTeams';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Typing the navigator
 
@@ -15,7 +16,8 @@ function App() {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={Index} />
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="AccountCreation" component={AccountCreation} /> {/* Ensure this is the correct screen name */}
+        <Stack.Screen name ="AccountCreation" component={AccountCreation} /> {/* Ensure this is the correct screen name */}
+        <Stack.Screen name ="favoriteTeams" component ={FavoriteTeams}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

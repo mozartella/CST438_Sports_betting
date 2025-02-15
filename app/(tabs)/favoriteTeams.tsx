@@ -54,7 +54,7 @@ const FavoriteTeams = () => {
     let updatedTeams = [...selectedTeams];
   
     if (updatedTeams.includes(teamId)) {
-      updatedTeams = updatedTeams.filter((id) => id !== teamId); // Remove if already selected
+      updatedTeams = updatedTeams.filter((id) => id !== teamId); 
     } else {
       if (updatedTeams.length >= 2) {
         alert(" You can only select up to 2 teams.");

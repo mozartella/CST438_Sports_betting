@@ -1,6 +1,7 @@
 
 INSERT INTO user (username, password)
-VALUES ("testUser1", "1234");
+VALUES ("testUser1", "1234"),
+("testUser2","1234");
 
 INSERT INTO team(team_id, team_name, nickname, logo_url)
 VALUES 

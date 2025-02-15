@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ImageBackground } from 'react-native';
+import { insertUser, isUsernameAvailable } from '../database/db'; // Import database functions
 import accountPic from '../assets/images/accountCreationPic.jpg'; // Your background image
 
 export default function AccountCreation() {
@@ -12,7 +13,7 @@ export default function AccountCreation() {
   const [usersTeam2, setTeam2] = useState('');
 
   // Handle account creation logic
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match!');
       return;
@@ -28,16 +29,37 @@ export default function AccountCreation() {
       return;
     }
 
-    // Simulate account creation success (replace this with actual API logic)
-    Alert.alert('Account Created', `Welcome, ${username}!`);
-    
-    // Reset form fields (optional)
-    setUsername('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-    setTeam1('');
-    setTeam2('');
+    // Check if the username already exists in the database
+    const usernameExists = await isUsernameAvailable(username);
+    if (!usernameExists) {
+      Alert.alert('Error', 'Username already exists!');
+      return;
+    }
+
+    try {
+      // Insert the new user into the database
+      await insertUser(username, password); 
+      
+      // Insert favorite teams (I need to modify this to fetch teams from team table)
+      // right now this is just kind of useless
+      const userId = await getUserID(username); 
+      await insertFavoriteTeam(userId, usersTeam1); 
+      await insertFavoriteTeam(userId, usersTeam2); 
+
+      // Simulate account creation success
+      Alert.alert('Account Created', `Welcome, ${username}!`);
+
+      // Reset form fields (optional)
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setTeam1('');
+      setTeam2('');
+    } catch (error) {
+      console.error('Error creating account:', error);
+      Alert.alert('Error', 'An error occurred while creating the account.');
+    }
   };
 
   return (
@@ -132,3 +154,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+

@@ -1,79 +1,86 @@
-const { db } = require('./db');
+import * as SQLite from 'expo-sqlite';
 
-// insert a new user into the database
-function insertUser(username, password) {
-    const sql = `
-        INSERT INTO user (username, password)
-        VALUES (?, ?);
-    `;
-    db.prepare(sql).run(username, password);
+// Open the database and assign it to a `db` variable
+const db = await SQLite.openDatabaseAsync('database.db');
+
+
+
+// Insert a new user into the database
+async function insertUser(username, password) {
+    await db.runAsync(
+        `INSERT INTO user (username, password) VALUES (?, ?);`,
+        username,
+        password
+    );
 }
 
-// varify login info
-function verifyUserLogin(username, password) {
-    const sql = `
-        SELECT password
-        FROM user
-        WHERE username = ?;
-    `;
-    const user = db.prepare(sql).get(username);
-    if ((user) && user.password == password) {
-        return true;
-    } else {
-        return false;
+// Verify login info
+// Verify login info
+async function verifyUserLogin(username, password) {
+    try {
+        // First, check if the user exists with the provided username
+        const user = await db.getFirstAsync(
+            'SELECT password FROM user WHERE username = $username', 
+            { $username: username }
+        );
+
+        // Log the user details to check the result
+        console.log('User from verifyUserLogin:', user);
+
+        if (user) {
+            // Check if the password matches
+            if (user.password === password) {
+                console.log('Login successful');
+                return true;
+            } else {
+                console.log('Invalid password');
+                return false;
+            }
+        } else {
+            console.log('User not found');
+            return false;
+        }
+    } catch (error) {
+        console.error("Login verification failed:", error);
+        return false;  // Return false in case of error
     }
 }
+  
 
-// for account recovery
-function updatePassword(username, oldPassword, newPassword) {
-    const sql = `
-        UPDATE user
-        SET password = ?
-        WHERE username = ? AND password = ?;
-    `;
-    db.prepare(sql).run(newPassword, username, oldPassword);
+// For account recovery
+async function updatePassword(username, oldPassword, newPassword) {
+    await db.runAsync(
+        `UPDATE user SET password = ? WHERE username = ? AND password = ?;`,
+        newPassword,
+        username,
+        oldPassword
+    );
 }
 
-// for ensuring usernames are unique
-function isUsernameAvailable(username) {
-    const sql = `
-        SELECT username
-        FROM user
-        WHERE username = ?;
-    `;
-    const user = db.prepare(sql).get(username);
-    if (user) {
-        return false;
-    } else {
-        return true;
-    }
-} 
-
-// remove a user from the database
-function removeUser(username) {
-    const sql = `
-        DELETE FROM user
-        WHERE username = ?;
-    `;
-    db.prepare(sql).run(username);
+// For ensuring usernames are unique
+async function isUsernameAvailable(username) {
+    const user = await db.getFirstAsync(
+        `SELECT username FROM user WHERE username = ?;`,
+        username
+    );
+    return !user;
 }
 
-// get user ID based on username
-function getUserID(username) {
-    const sql = `
-        SELECT id
-        FROM user
-        WHERE username = ?;
-    `;
-    const user = db.prepare(sql).get(username);
-    if (user) {
-        return user.id;
-    } else {
-        return null;
-    }
+// Remove a user from the database
+async function removeUser(username) {
+    await db.runAsync(`DELETE FROM user WHERE username = ?;`, username);
 }
 
-module.exports = {
+// Get user ID based on username
+async function getUserID(username) {
+    const user = await db.getFirstAsync(
+        `SELECT id FROM user WHERE username = ?;`,
+        username
+    );
+    return user ? user.id : null;
+}
+
+export {
     insertUser,
     verifyUserLogin,
     updatePassword,
@@ -81,3 +88,4 @@ module.exports = {
     removeUser,
     getUserID
 };
+
