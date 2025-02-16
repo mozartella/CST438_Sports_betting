@@ -96,7 +96,7 @@ export async function logDatabaseContents() {
     await initializeDatabase();  // Ensure the database is initialized
 
     try {
-        // Fetch data from each table and log to console
+       // Fetch data from each table and log to console
         // const users = await db.getAllAsync('SELECT * FROM user;');
         // console.log('Users:', users);
 
@@ -233,6 +233,8 @@ export async function addTeamToFavs(username, team_name) {
     const userID = await getUserID(username);
     const teamID = await getTeamID(team_name);
 
+    console.log(userID);
+
     if (userID && teamID) {
         await db.runAsync(
             `INSERT INTO favorite (team_id, user_id) VALUES (?, ?);`,
@@ -306,6 +308,20 @@ export async function removeTeamFromFav(username, team_name) {
             user_id,
             team_id
         );
+    }
+}
+// Wipe user favorites
+export async function wipeUserFavorites(username) {
+    const userID = await getUserID(username);
+
+    if (userID) {
+        await db.runAsync(
+            `DELETE FROM favorite WHERE user_id = ?;`,
+            userID
+        );
+     //   console.log(`All favorites for user ${username} have been deleted.`);
+    } else {
+        console.log(`User ${username} not found.`);
     }
 }
 

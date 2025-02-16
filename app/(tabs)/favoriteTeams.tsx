@@ -17,6 +17,7 @@ import {
   removeTeamFromFav,
   getAllFavTeamInfo,
   logDatabaseContents,
+  wipeUserFavorites,  // Import wipeUserFavorites
 } from "../../database/db";
 
 interface Team {
@@ -34,7 +35,7 @@ const FavoriteTeams = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
-    // Fetch the stored username from AsyncStorage (this is how im keeping track without contexts)
+    // Fetch the stored username from AsyncStorage
     const fetchUserName = async () => {
       const storedUserName = await AsyncStorage.getItem("username");
       if (storedUserName) {
@@ -42,6 +43,7 @@ const FavoriteTeams = () => {
       } else {
         console.warn("No userName found in AsyncStorage");
       }
+      console.log(storedUserName);
     };
 
     // Fetch all teams from the API
@@ -64,16 +66,24 @@ const FavoriteTeams = () => {
 
     fetchUserName();
     fetchTeams();
-  }, []);
+
+    // wipeUserFavorites to clear favorites on each visit to this screen
+    const clearUserFavorites = async () => {
+      if (userName) {
+        await wipeUserFavorites(userName); 
+      }
+    };
+
+    clearUserFavorites();  // Clear favorites when the component mounts (or based on any condition you prefer)
+  }, [userName]);
 
   // Fetch user's favorite teams from the database once userName is available
-  // Note im keeping the logic from previous iteration in case I have to roll back to using asynch data
   useEffect(() => {
     if (userName) {
       const fetchFavoriteTeams = async () => {
         const favTeams = await getAllFavTeamInfo(userName);
-        const favTeamNames = favTeams.map((team) => team[0]); 
-        setSelectedTeams(favTeamNames); 
+        const favTeamNames = favTeams.map((team) => team[0]); // Assuming the first element is the team name
+        setSelectedTeams(favTeamNames); // Update the selected teams after fetching favorites
       };
 
       fetchFavoriteTeams();
@@ -91,8 +101,9 @@ const FavoriteTeams = () => {
       await removeTeamFromFav(userName, team_name);
       updatedTeams = updatedTeams.filter((name) => name !== team_name);
     } else {
-      if (updatedTeams.length >= 2) {
-        alert("You can only select up to 2 teams.");
+      if (updatedTeams.length >= 4) {
+        // potential bug if you go past 4 ... no idea why
+        alert("You can only select up to 4 teams.");
         return;
       }
       // Add team to DB if not favorited
