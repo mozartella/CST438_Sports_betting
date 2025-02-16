@@ -5,6 +5,7 @@ import {
   FlatList,
   StyleSheet,
   ActivityIndicator,
+  Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { callGamesByDate } from "../ApiScripts";
@@ -26,7 +27,7 @@ const UpcomingGames = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [userName, setUserName] = useState<string | null>(null);
 
-  // Fetch username from AsyncStorage 
+  // Fetch username from AsyncStorage
   useEffect(() => {
     const fetchUserName = async () => {
       const storedUserName = await AsyncStorage.getItem("username");
@@ -51,8 +52,7 @@ const UpcomingGames = () => {
 
       // Fetch favorite teams directly from the database using the username
       const favTeams = await getAllFavTeamInfo(userName);
-      const favTeamNames = favTeams.map((team) => team[0]); 
-
+      const favTeamNames = favTeams.map((team) => team[0]);
       if (favTeamNames.length === 0) {
         console.warn("No favorite teams found.");
         setGames([]);
@@ -62,21 +62,26 @@ const UpcomingGames = () => {
       // Get current date and calculate the end date (14 days ahead)
       const currentDate = new Date();
       const endDate = new Date(currentDate);
-      endDate.setDate(currentDate.getDate() + 14); 
+      endDate.setDate(currentDate.getDate() + 14);
 
-      const startDateString = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-      const endDateString = endDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      const startDateString = currentDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+      const endDateString = endDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
 
-      console.log("Fetching games from:", startDateString, "to:", endDateString);
-
+      console.log(
+        "Fetching games from:",
+        startDateString,
+        "to:",
+        endDateString
+      );
+ 
       // Fetch games for each of the selected teams using callGamesByDate
       let allGames: Game[] = [];
       for (const teamID of favTeamNames) {
         console.log(`📡 Fetching games for team: ${teamID}`);
         const teamGames = await callGamesByDate(
-          startDateString, 
-          endDateString, 
-          teamID 
+          startDateString,
+          endDateString,
+          teamID
         );
 
         if (teamGames.length === 0) {
@@ -106,7 +111,6 @@ const UpcomingGames = () => {
   useFocusEffect(
     useCallback(() => {
       console.log("re-fetching games...");
-      // Trigger the fetchGames logic here
       fetchGames();
     }, [fetchGames])
   );
@@ -126,17 +130,26 @@ const UpcomingGames = () => {
           data={games}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => {
-            // Determine the win metric based on home or away team
-            const homeWinRate = 0.51; // 51% for home team
-            const awayWinRate = 0.49; // 49% for away team
-            const isHomeTeam = item.homeTeam.name === "teamName"; // This isn't working yet
-            const winRate = isHomeTeam ? homeWinRate : awayWinRate;
+            const isHomeTeam = item.homeTeam.name === "The home team from list";
+            const winRate = isHomeTeam ? 0.51 : 0.49;
 
             return (
               <View style={styles.gameItem}>
-                <Text style={styles.teamText}>
-                  {item.homeTeam.name} vs {item.awayTeam.name}
-                </Text>
+                {/* Logos */}
+                <View style={styles.teamLogoContainer}>
+                  <Image
+                    source={{ uri: item.homeTeam.logo }}
+                    style={styles.teamLogo}
+                  />
+                  <Text style={styles.teamText}>
+                    {item.homeTeam.name} vs {item.awayTeam.name}
+                  </Text>
+                  <Image
+                    source={{ uri: item.awayTeam.logo }}
+                    style={styles.teamLogo}
+                  />
+                </View>
+
                 <Text style={styles.dateText}>
                   {item.date.toLocaleDateString()}
                 </Text>
@@ -153,14 +166,58 @@ const UpcomingGames = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 16 },
-  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
-  errorText: { fontSize: 16, color: "red", textAlign: "center" },
-  gameItem: { padding: 16, borderBottomWidth: 1, borderBottomColor: "#ccc" },
-  teamText: { fontSize: 18 },
-  dateText: { fontSize: 16, color: "#666" },
-  winRateText: { fontSize: 16, color: "#4CAF50", marginTop: 8 }, 
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 22, // Adjusted font size for better fit
+    fontWeight: "bold",
+    marginBottom: 12, // Reduced margin for better fit on smaller screens
+    textAlign: "center",
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    textAlign: "center",
+  },
+  gameItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    marginBottom: 12,
+  },
+  teamText: {
+    fontSize: 16, 
+    textAlign: "center", 
+  },
+  dateText: {
+    fontSize: 14, 
+    color: "#666",
+    textAlign: "center", 
+  },
+  winRateText: {
+    fontSize: 14, 
+    color: "#4CAF50",
+    marginTop: 6, 
+    textAlign: "center",
+  },
+  teamLogoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center", 
+    marginBottom: 8,  
+  },
+  teamLogo: {
+    width: 30,
+    height: 30,
+    marginHorizontal: 8,
+  },
 });
-
 export default UpcomingGames;
