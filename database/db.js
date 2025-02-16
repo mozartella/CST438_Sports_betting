@@ -90,6 +90,28 @@ export async function initializeDatabase() {
     }
 }
 // -------------------------------- userTableFunctions ------------------------------------------
+
+// logging function
+export async function logDatabaseContents() {
+    await initializeDatabase();  // Ensure the database is initialized
+
+    try {
+        // Fetch data from each table and log to console
+        // const users = await db.getAllAsync('SELECT * FROM user;');
+        // console.log('Users:', users);
+
+        // const teams = await db.getAllAsync('SELECT * FROM team;');
+        // console.log('Teams:', teams);
+
+        const favorites = await db.getAllAsync('SELECT * FROM favorite;');
+        console.log('Favorites:', favorites);
+
+    } catch (error) {
+        console.error('Error fetching data from database:', error);
+    }
+}
+
+
 // Insert a new user into the database
 export async function insertUser(username, password) {
     await initializeDatabase();  

@@ -16,6 +16,7 @@ import {
   addTeamToFavs,
   removeTeamFromFav,
   getAllFavTeamInfo,
+  logDatabaseContents,
 } from "../../database/db";
 
 interface Team {
@@ -29,87 +30,93 @@ const FavoriteTeams = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [userID, setUserID] = useState<number | null>(null); // Store userID as a number (THIS IS KEY)
+  const [userName, setUserName] = useState<string | null>(null); // Store username for database operations
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
-    const fetchUserID = async () => {
-      const userID = await AsyncStorage.getItem("userID");
-      console.log("Stored User ID:", userID); // Log string
-      if (userID) {
-        const parsedUserID = parseInt(userID);
-        console.log("Parsed User ID:", parsedUserID); // Log the parsed value
-        setUserID(parsedUserID); // Set the parsed value
+    // Fetch the stored username from AsyncStorage (this is how im keeping track without contexts)
+    const fetchUserName = async () => {
+      const storedUserName = await AsyncStorage.getItem("username");
+      if (storedUserName) {
+        setUserName(storedUserName);
       } else {
-        console.warn("No userID found in AsyncStorage");
+        console.warn("No userName found in AsyncStorage");
       }
     };
 
+    // Fetch all teams from the API
     const fetchTeams = async () => {
       setLoading(true);
       try {
-        process.env.RAPIDAPI_KEY =
-          "f48a5921f5msh580809ba8c9e6cfp181a8ajsn545d715d6844";
+        process.env.RAPIDAPI_KEY = "f48a5921f5msh580809ba8c9e6cfp181a8ajsn545d715d6844";
         const teamData = await callTeams();
 
-        if (!teamData || teamData.length === 0) {
-          console.error("No teams received from API. Possible API Key issue.");
+        if (teamData && teamData.length > 0) {
+          setTeams(teamData);
+        } else {
+          console.error("No teams received from API.");
         }
-
-        setTeams(teamData);
       } catch (error) {
         console.error("Error fetching teams:", error);
       }
       setLoading(false);
     };
 
-    fetchUserID();
+    fetchUserName();
     fetchTeams();
   }, []);
 
+  // Fetch user's favorite teams from the database once userName is available
+  // Note im keeping the logic from previous iteration in case I have to roll back to using asynch data
   useEffect(() => {
-    if (userID !== null) {
+    if (userName) {
       const fetchFavoriteTeams = async () => {
-        const favTeams = await getAllFavTeamInfo(userID);
-        const favTeamIds = favTeams.map((team) => team[0]); // Extract team_ids from the result
-        setSelectedTeams(favTeamIds);
+        const favTeams = await getAllFavTeamInfo(userName);
+        const favTeamNames = favTeams.map((team) => team[0]); 
+        setSelectedTeams(favTeamNames); 
       };
 
       fetchFavoriteTeams();
     }
-  }, [userID]);
+  }, [userName]);
 
-  const toggleTeamSelection = async (teamId: string) => {
-    if (userID === null) return;
+  // Toggle favorite team selection
+  const toggleTeamSelection = async (team_name: string) => {
+    if (!userName) return;
 
     let updatedTeams = [...selectedTeams];
 
-    if (updatedTeams.includes(teamId)) {
-      updatedTeams = updatedTeams.filter((id) => id !== teamId);
-      // Remove from DB
-      await removeTeamFromFav(userID, teamId);
+    if (updatedTeams.includes(team_name)) {
+      // Remove from DB if already favorited
+      await removeTeamFromFav(userName, team_name);
+      updatedTeams = updatedTeams.filter((name) => name !== team_name);
     } else {
       if (updatedTeams.length >= 2) {
         alert("You can only select up to 2 teams.");
         return;
       }
-      updatedTeams.push(teamId);
-      // Add team to DB
-      await addTeamToFavs(userID, teamId);
-      console.log("teamID: ", teamId)
-  
+      // Add team to DB if not favorited
+      await addTeamToFavs(userName, team_name);
+      updatedTeams.push(team_name);
     }
 
+    // Update selected teams state
     setSelectedTeams(updatedTeams);
+
+    // Update AsyncStorage (Kept this in case passing info to database doesn't work)
     AsyncStorage.setItem("favoriteTeams", JSON.stringify(updatedTeams));
 
-    console.log("Updated favorite teams stored:", updatedTeams);
+    // Log the updated teams in DB (Checking database)
+    const updatedFavTeams = await getAllFavTeamInfo(userName);
+    console.log("Updated favorite teams in DB:", updatedFavTeams);
+
+    // Log the database contents after the update (Full check)
+    await logDatabaseContents();
   };
 
-  if (loading)
-    return (
-      <ActivityIndicator style={styles.loader} size="large" color="#0000ff" />
-    );
+  if (loading) {
+    return <ActivityIndicator style={styles.loader} size="large" color="#0000ff" />;
+  }
 
   return (
     <View style={styles.container}>
@@ -124,9 +131,9 @@ const FavoriteTeams = () => {
             <TouchableOpacity
               style={[
                 styles.teamItem,
-                selectedTeams.includes(item.id) ? styles.selectedTeam : {},
+                selectedTeams.includes(item.name) ? styles.selectedTeam : {},
               ]}
-              onPress={() => toggleTeamSelection(item.id)}
+              onPress={() => toggleTeamSelection(item.name)}
             >
               <View style={styles.teamContainer}>
                 <Image source={{ uri: item.logo }} style={styles.logo} />

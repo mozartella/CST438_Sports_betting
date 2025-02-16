@@ -7,6 +7,7 @@ import LoginScreen from './(tabs)/login';
 import AccountCreation from './AccountCreation'; // The account creation screen
 import { RootStackParamList } from '../app/navagation/types'; // Navigation types
 import FavoriteTeams from './(tabs)/favoriteTeams';
+import LogoutScreen from './(tabs)/logout';
 
 const Stack = createStackNavigator<RootStackParamList>(); // Typing the navigator
 
@@ -18,6 +19,7 @@ function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name ="AccountCreation" component={AccountCreation} /> {/* Ensure this is the correct screen name */}
         <Stack.Screen name ="favoriteTeams" component ={FavoriteTeams}/>
+        <Stack.Screen name="Logout" component={LogoutScreen} /> {/* Add LogoutScreen */}
       </Stack.Navigator>
     </NavigationContainer>
   );
