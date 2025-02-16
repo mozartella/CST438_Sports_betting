@@ -12,26 +12,27 @@ import {
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/types";
 import loginPic from "../../assets/images/loginPic2.jpg";
-import { verifyUserLogin,initializeDatabase } from "../../database/db";  // Import the verifyUserLogin function from db.js
+import { verifyUserLogin, getUserID, initializeDatabase } from "../../database/db"; 
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 
-
-export default function loginScreen() {
+export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [dbInitialized, setDbInitialized] = useState(false);  // Track if the DB is initialized
+
+  // I deleted this but then was having some issues... so back in for now
+  const [dbInitialized, setDbInitialized] = useState(false); 
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  // // We should probably move this over to our home screen because we want the db to load on our first screen
   useEffect(() => {
-    // Initialize the database and create tables when the component mounts
+    // Initialize the database 
     const initializeDb = async () => {
       try {
-        // call the function to initialize database and wait for it to finish
-        await initializeDatabase(); 
+        // Call the function to initialize database and wait for it to finish
+        await initializeDatabase();
 
-        // this was used for testing purposes
-        setDbInitialized(true);  
+        // Set the DB initialized to true
+        setDbInitialized(true);
       } catch (error) {
         console.error("Database initialization error: ", error);
         Alert.alert("Error", "An error occurred while initializing the database.");
@@ -41,7 +42,7 @@ export default function loginScreen() {
     initializeDb();
   }, []);
 
-  // handle user not filling out username or password
+  // Handle user not filling out username or password
   const handleLogin = async () => {
     if (!username || !password) {
       Alert.alert("Error", "Please enter both username and password.");
@@ -50,14 +51,25 @@ export default function loginScreen() {
 
     setLoading(true);
 
-    // Check user login asynchronously
     try {
-      const success = await verifyUserLogin(username, password);
+      // First, verify the login credentials (e.g., check if password matches)
+      const isValidUser = await verifyUserLogin(username, password);
       setLoading(false);
 
-      if (success) {
-        Alert.alert("Welcome", "You are now logged in!");
-        setTimeout(() => navigation.navigate("favoriteTeams"), 500);
+      if (isValidUser) {
+       // get the userID based on the username
+        const userID = await getUserID(username);
+
+        if (userID) {
+          // Save userID and username to AsyncStorage
+          await AsyncStorage.setItem("userID", userID.toString()); // in case we need
+          await AsyncStorage.setItem("username", username); // Store the username (definitely need)
+
+          Alert.alert("Welcome", "You are now logged in!");
+          setTimeout(() => navigation.navigate("favoriteTeams"), 500);
+        } else {
+          Alert.alert("Error", "User not found.");
+        }
       } else {
         Alert.alert("Error", "Incorrect username or password.");
       }
@@ -68,8 +80,6 @@ export default function loginScreen() {
     }
   };
 
-  // Wait until DB initialization is complete (This can probably be removed)
-  // Was used during testing
   if (!dbInitialized) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -114,20 +124,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 5,
     backgroundColor: "#fff",
-    width: "80%",  // Adjust width to make input fields look more consistent with the second example
+    width: "80%",
   },
   backgroundImage: {
     flex: 1,
     width: "100%",
     justifyContent: "center",
   },
-  formContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background for the form
-    padding: 20,
-    borderRadius: 10,
-    width: "80%",  // Ensure the form is not too wide
-  },
-  buttonContainer: {
-    marginTop: 10,
-  },
 });
+
+

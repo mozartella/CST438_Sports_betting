@@ -42,7 +42,7 @@ export const callTeams = async () => {
         logo: team.logo,
       }));
 
-    console.log("teamData:", teamData);
+    //console.log("teamData:", teamData);
     return teamData;
   } catch (error) {
     console.error("Error fetching teams:", error);
