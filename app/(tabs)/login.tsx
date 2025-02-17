@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../navigation/types";
+import { RootStackParamList } from "../navagation/types";
 import loginPic from "../../assets/images/loginPic2.jpg";
 import { verifyUserLogin, getUserID, initializeDatabase } from "../../database/db"; 
 import AsyncStorage from "@react-native-async-storage/async-storage"; 
@@ -66,7 +66,7 @@ export default function LoginScreen() {
           await AsyncStorage.setItem("username", username); // Store the username (definitely need)
 
           Alert.alert("Welcome", "You are now logged in!");
-          setTimeout(() => navigation.navigate("favoriteTeams"), 500);
+          setTimeout(() => navigation.navigate("FavoriteTeams"), 500);
         } else {
           Alert.alert("Error", "User not found.");
         }
