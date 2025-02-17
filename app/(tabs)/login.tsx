@@ -66,7 +66,7 @@ export default function LoginScreen() {
           await AsyncStorage.setItem("username", username); // Store the username (definitely need)
 
           Alert.alert("Welcome", "You are now logged in!");
-          setTimeout(() => navigation.navigate("FavoriteTeams"), 500);
+          setTimeout(() => navigation.navigate("favoriteTeams"), 500);
         } else {
           Alert.alert("Error", "User not found.");
         }
