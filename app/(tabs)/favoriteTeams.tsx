@@ -17,7 +17,7 @@ import {
   removeTeamFromFav,
   getAllFavTeamInfo,
   logDatabaseContents,
-  wipeUserFavorites,  // Import wipeUserFavorites
+  wipeUserFavorites,  
 } from "../../database/db";
 
 interface Team {
