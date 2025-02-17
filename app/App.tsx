@@ -20,7 +20,7 @@ function App() {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name ="AccountCreation" component={AccountCreation} /> {/* Ensure this is the correct screen name */}
-        <Stack.Screen name ="favoriteTeams" component ={FavoriteTeams}/>
+        <Stack.Screen name ="FavoriteTeams" component ={favoriteTeams}/>
         <Stack.Screen name="Logout" component={LogoutScreen} /> {/* Add LogoutScreen */}
       </Stack.Navigator>
     </NavigationContainer>
