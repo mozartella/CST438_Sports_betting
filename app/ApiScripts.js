@@ -14,25 +14,20 @@ export const apiCall = async (endpoint) => {
     return null;
   }
 };
-
 export const callTeams = async () => {
   try {
     const json = await apiCall(
       "https://api-nba-v1.p.rapidapi.com/teams?league=standard"
     );
-
     if (!json || !json.response) {
       throw new Error("Invalid API response");
     }
-
     // Create the teamData array with below structure
     const teamData = json.response
-
       // I want to filter out teams that aren't nbaFranchises (you would think I could use the league filter, but it isn't an option)
       // I want to check the nbaFranchise field and return a new array populated only with teams where this field is true
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
       .filter((team) => team.nbaFranchise === true)
-
       // I also want to sort out specific information.
       // This may change depending on what we need. For now, it will map out the fields we use in our table
       .map((team) => ({
@@ -41,7 +36,6 @@ export const callTeams = async () => {
         nickname: team.nickname,
         logo: team.logo,
       }));
-
     console.log("teamData:", teamData);
     return teamData;
   } catch (error) {
@@ -49,17 +43,14 @@ export const callTeams = async () => {
     return [];
   }
 };
-
 export const callGamesByDate = async (startDate, endDate, teamID) => {
   try {
     const json = await apiCall(
       `https://api-nba-v1.p.rapidapi.com/games?league=standard&season=2024&team=${teamID}`
     );
-
     if (!json || !json.response) {
       throw new Error("Invalid API response");
     }
-
     // Filter games based on the provided date range. It was a lot easier to filter out games outside the range
     // than to select each date in the range and check.
     // this also prevents having to check if there is a game on a specific date
@@ -70,7 +61,6 @@ export const callGamesByDate = async (startDate, endDate, teamID) => {
         const end = new Date(endDate);
         return gameDate >= start && gameDate <= end;
       })
-
       // I think I could make call Teams redundant with this stuff at some point.
       .map((game) => ({
         id: game.id,
@@ -88,12 +78,9 @@ export const callGamesByDate = async (startDate, endDate, teamID) => {
           logo: game.teams.visitors.logo,
         },
       }));
-
     return gameData; // Return the filtered and mapped game data
   } catch (error) {
     console.error("Error fetching games:", error);
     return [];
   }
 };
-
-export default apiCall;

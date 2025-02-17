@@ -1,5 +1,4 @@
 const { db } = require('./db');
-
 // insert a new user into the database
 function insertUser(username, password) {
     const sql = `
@@ -8,7 +7,6 @@ function insertUser(username, password) {
     `;
     db.prepare(sql).run(username, password);
 }
-
 // varify login info
 function verifyUserLogin(username, password) {
     const sql = `
@@ -23,7 +21,6 @@ function verifyUserLogin(username, password) {
         return false;
     }
 }
-
 // for account recovery
 function updatePassword(username, oldPassword, newPassword) {
     const sql = `
@@ -33,7 +30,6 @@ function updatePassword(username, oldPassword, newPassword) {
     `;
     db.prepare(sql).run(newPassword, username, oldPassword);
 }
-
 // for ensuring usernames are unique
 function isUsernameAvailable(username) {
     const sql = `
@@ -47,8 +43,7 @@ function isUsernameAvailable(username) {
     } else {
         return true;
     }
-} 
-
+}
 // remove a user from the database
 function removeUser(username) {
     const sql = `
@@ -57,7 +52,6 @@ function removeUser(username) {
     `;
     db.prepare(sql).run(username);
 }
-
 // get user ID based on username
 function getUserID(username) {
     const sql = `
@@ -72,7 +66,6 @@ function getUserID(username) {
         return null;
     }
 }
-
 module.exports = {
     insertUser,
     verifyUserLogin,
@@ -81,3 +74,10 @@ module.exports = {
     removeUser,
     getUserID
 };
+
+
+
+
+
+
+
