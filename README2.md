@@ -3,8 +3,6 @@
 **Github Repo Link**  
 [https://github.com/KCrapo/Project01](https://github.com/KCrapo/Project01)
 
-**ReadMe**  
-Needs to be turned into a README PDF and submit this. Please do not forget. DELETE THIS SECTION
 
 ## Overview
 
