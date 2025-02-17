@@ -1,105 +1,118 @@
-const { db } = require('./db');
-const { getUserID } = require('./userDB');
+import * as SQLite from 'expo-sqlite';
+import { getUserID } from './userDB';
 
-// insert a team manually
-function insertTeamManually(team_id, team_name, nickname, logo_url) {
-    const sql = `
-        INSERT INTO team(team_id, team_name, nickname, logo_url)
-        VALUES(?, ?, ?, ?);
-    `;
-    db.prepare(sql).run(team_id, team_name, nickname, logo_url);
+let db;
+
+async function initializeDatabase() {
+    db = await SQLite.openDatabaseAsync('database.db');
 }
 
-// insert a team using an array
-function insertTeam([team_id, team_name, nickname, logo_url]) {
-    const sql = `
-        INSERT INTO team(team_id, team_name, nickname, logo_url)
-        VALUES(?, ?, ?, ?);
-    `;
-    db.prepare(sql).run(team_id, team_name, nickname, logo_url);
+await initializeDatabase();
+
+// Insert a team manually
+async function insertTeamManually(team_id, team_name, nickname, logo_url) {
+    await db.runAsync(
+        `INSERT INTO team (team_id, team_name, nickname, logo_url) VALUES (?, ?, ?, ?);`,
+        team_id,
+        team_name,
+        nickname,
+        logo_url
+    );
 }
 
-// add a team to a users favorites
-function addTeamToFavs(username, team_name) {
-    const userID = getUserID(username);
-    const teamID = getTeamID(team_name);
-    const sql = `
-        INSERT INTO favorite (team_id, user_id)
-        VALUES(?, ?);
-    `;
-    db.prepare(sql).run(teamID, userID);
+// Insert a team using an array
+async function insertTeam([team_id, team_name, nickname, logo_url]) {
+    await db.runAsync(
+        `INSERT INTO team (team_id, team_name, nickname, logo_url) VALUES (?, ?, ?, ?);`,
+        team_id,
+        team_name,
+        nickname,
+        logo_url
+    );
 }
 
-// get all favorite team IDs of a user
-function getFavTeamID(username) {
-    const userID = getUserID(username);
-    const sql = `
-        SELECT team_id
-        FROM favorite
-        WHERE user_id = ?;
-    `;
-    return db.prepare(sql).all(userID).map(team => team.team_id);
+// Add a team to a user's favorites
+async function addTeamToFavs(username, team_name) {
+    const userID = await getUserID(username);
+    const teamID = await getTeamID(team_name);
+
+    if (userID && teamID) {
+        await db.runAsync(
+            `INSERT INTO favorite (team_id, user_id) VALUES (?, ?);`,
+            teamID,
+            userID
+        );
+    }
 }
 
-// get favorite team names of a user
-function getFavTeamNames(username) {
-    const team_ids = getFavTeamID(username);
+// Get all favorite team IDs of a user
+async function getFavTeamID(username) {
+    const userID = await getUserID(username);
+    const teams = await db.getAllAsync(
+        `SELECT team_id FROM favorite WHERE user_id = ?;`,
+        userID
+    );
+    return teams.map(team => team.team_id);
+}
+
+// Get favorite team names of a user
+async function getFavTeamNames(username) {
+    const team_ids = await getFavTeamID(username);
     let names = [];
-    for (let i = 0; i < team_ids.length; ++i) {
-        let sql = `
-            SELECT team_name
-            FROM team
-            WHERE team_id = ?;
-        `;
-        names.push(db.prepare(sql).get(team_ids[i]).team_name);
+
+    for (const team_id of team_ids) {
+        const team = await db.getFirstAsync(
+            `SELECT team_name FROM team WHERE team_id = ?;`,
+            team_id
+        );
+        if (team) {
+            names.push(team.team_name);
+        }
     }
     return names;
 }
 
-// get all favorite team information of a user
-function getAllFavTeamInfo(username) {
-    const team_ids = getFavTeamID(username);
+// Get all favorite team information of a user
+async function getAllFavTeamInfo(username) {
+    const team_ids = await getFavTeamID(username);
     let teamInfo = [];
-    for (let i = 0; i < team_ids.length; ++i) {
-        let sql = `
-            SELECT team_id, team_name, nickname, logo_url
-            FROM team
-            WHERE team_id = ?;
-        `;
-        let team = db.prepare(sql).get(team_ids[i]);
 
-        teamInfo.push([team.team_id, team.team_name, team.nickname, team.logo_url]);
+    for (const team_id of team_ids) {
+        const team = await db.getFirstAsync(
+            `SELECT team_id, team_name, nickname, logo_url FROM team WHERE team_id = ?;`,
+            team_id
+        );
+        if (team) {
+            teamInfo.push([team.team_id, team.team_name, team.nickname, team.logo_url]);
+        }
     }
     return teamInfo;
 }
 
-// get a teams id 
-function getTeamID(team_name) {
-    const sql = `
-        SELECT team_id
-        FROM team
-        WHERE team_name = ?
-    `;
-    const team = db.prepare(sql).get(team_name);
-    if (team) {
-        return team.team_id;
-    } else {
-        return null;
+// Get a team's ID 
+async function getTeamID(team_name) {
+    const team = await db.getFirstAsync(
+        `SELECT team_id FROM team WHERE team_name = ?;`,
+        team_name
+    );
+    return team ? team.team_id : null;
+}
+
+// Remove selected team from favorites 
+async function removeTeamFromFav(username, team_name) {
+    const user_id = await getUserID(username);
+    const team_id = await getTeamID(team_name);
+
+    if (user_id && team_id) {
+        await db.runAsync(
+            `DELETE FROM favorite WHERE user_id = ? AND team_id = ?;`,
+            user_id,
+            team_id
+        );
     }
 }
 
-// remove selected team from favorite 
-function removeTeamFromFav(username, team_name) {
-    let user_id = getUserID(username);
-    let team_id = getTeamID(team_name);
-    const sql = `
-        DELETE FROM favorite
-        WHERE user_id = ? AND team_id = ?
-    `;
-    db.prepare(sql).run(user_id, team_id);
-}
-
-module.exports = {
+export {
     insertTeamManually,
     insertTeam,
     addTeamToFavs,

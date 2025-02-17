@@ -1,78 +1,109 @@
+import React, { useState, useEffect } from "react";
+import {
+  Text,
+  View,
+  TextInput,
+  StyleSheet,
+  Button,
+  Alert,
+  ImageBackground,
+  ActivityIndicator,
+} from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../navagation/types"; 
-import React, { useState } from 'react';
-import { ActivityIndicator } from 'react-native';
-import { Text, View, TextInput, StyleSheet, Button, Alert, Dimensions, ImageBackground } from 'react-native';
-import loginPic from '../../assets/images/loginPic2.jpg';
+import { RootStackParamList } from "../navigation/types";
+import loginPic from "../../assets/images/loginPic2.jpg";
+import { verifyUserLogin, getUserID, initializeDatabase } from "../../database/db"; 
+import AsyncStorage from "@react-native-async-storage/async-storage"; 
 
-
-const LoginScreen = () => {
+export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState(""); 
-  const [loading, setLoading] = useState(false); // Add loading state
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>(); 
+  const [loading, setLoading] = useState(false);
 
+  // I deleted this but then was having some issues... so back in for now
+  const [dbInitialized, setDbInitialized] = useState(false); 
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  useEffect(() => {
+    // Initialize the database 
+    const initializeDb = async () => {
+      try {
+        // Call the function to initialize database and wait for it to finish
+        await initializeDatabase();
+
+        // Set the DB initialized to true
+        setDbInitialized(true);
+      } catch (error) {
+        console.error("Database initialization error: ", error);
+        Alert.alert("Error", "An error occurred while initializing the database.");
+      }
+    };
+
+    initializeDb();
+  }, []);
+
+  // Handle user not filling out username or password
   const handleLogin = async () => {
-    setMessage("");
-    setLoading(true); // Show loading indicator
+    if (!username || !password) {
+      Alert.alert("Error", "Please enter both username and password.");
+      return;
+    }
 
-    //"http://10.0.2.2:8082"; // Android emulator
-    //"http://localhost:8082/login";
-    
+    setLoading(true);
+
     try {
-      const response = await fetch("http://10.0.2.2:8082/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      // First, verify the login credentials (e.g., check if password matches)
+      const isValidUser = await verifyUserLogin(username, password);
+      setLoading(false);
 
-      const data = await response.json();
-      if (data.success) {
-        setMessage(` Welcome back, ${username}!`);
-        
-        setTimeout(() => {
-          setLoading(false); // Hide loading indicator
-          navigation.navigate("Home"); 
-        }, 500);
+      if (isValidUser) {
+       // get the userID based on the username
+        const userID = await getUserID(username);
 
+        if (userID) {
+          // Save userID and username to AsyncStorage
+          await AsyncStorage.setItem("userID", userID.toString()); // in case we need
+          await AsyncStorage.setItem("username", username); // Store the username (definitely need)
+
+          Alert.alert("Welcome", "You are now logged in!");
+          setTimeout(() => navigation.navigate("favoriteTeams"), 500);
+        } else {
+          Alert.alert("Error", "User not found.");
+        }
       } else {
-        setMessage(` Error: ${data.error}`);
-        setLoading(false); // Hide loading indicator
+        Alert.alert("Error", "Incorrect username or password.");
       }
     } catch (error) {
-      setMessage(" Network error. Try again.");
-      setLoading(false); // Hide loading indicator
-      console.error("Login error:", error);
+      setLoading(false);
+      Alert.alert("Error", "An error occurred while verifying login.");
+      console.error(error);
     }
   };
 
+  if (!dbInitialized) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
   return (
-
-    <ImageBackground source={loginPic} style={styles.container} resizeMode="cover">
-      <View style={styles.formContainer}>
-        <Text style={styles.label}>Username:</Text>
+    <ImageBackground source={loginPic} style={styles.backgroundImage}>
+      <View style={styles.container}>
         <TextInput
           style={styles.input}
-          placeholder="Enter your username"
-          onChangeText={setUsername}
+          placeholder="Username"
           value={username}
+          onChangeText={setUsername}
         />
-        <Text style={styles.label}>Password:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your password"
-          secureTextEntry={true}
-          onChangeText={setPassword}
+          placeholder="Password"
+          secureTextEntry
           value={password}
+          onChangeText={setPassword}
         />
-
-        {message ? <Text style={styles.message}>{message}</Text> : null}
-
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
-          <Button title="LOGIN" onPress={handleLogin} color="green" />
+          <Button title="Login" onPress={handleLogin} />
         )}
       </View>
     </ImageBackground>
@@ -82,18 +113,9 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-  },
-  formContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background for the form
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    borderRadius: 10,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-    color: '#333',
   },
   input: {
     width: "80%",
@@ -101,14 +123,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1,
     borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 15,
     borderRadius: 5,
+    backgroundColor: "#fff",
+    width: "80%",
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+  backgroundImage: {
+    flex: 1,
+    width: "100%",
+    justifyContent: "center",
   },
-  message: { fontSize: 14, color: "red", marginBottom: 10 },
 });
 
-export default LoginScreen;
+
+
+
