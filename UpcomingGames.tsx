@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { callGamesByDate } from "../ApiScripts"; 
+import { callGamesByDate } from "./app/ApiScripts";
 import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../navagation/types";
 
