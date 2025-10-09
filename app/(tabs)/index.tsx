@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useEffect } from "react";
 import { View, StyleSheet, Dimensions, Alert } from "react-native";
 import { Image } from "expo-image";
@@ -70,6 +71,18 @@ const Index = () => {
         {/* Add onPress to navigate */}
         <Button label="Create Account" onPress={handleCreateAccount} />
       </View>
+=======
+// app/(tabs)/index.tsx
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import UpcomingGames from "../UpcomingGames";
+
+export default function Home() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Upcoming Events</Text>
+      <UpcomingGames />
+>>>>>>> Stashed changes
     </View>
   );
 };
@@ -77,6 +90,7 @@ const Index = () => {
 const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
+<<<<<<< Updated upstream
   container: {
     flex: 1,
     backgroundColor: "#25292e",
@@ -97,3 +111,9 @@ const styles = StyleSheet.create({
 });
 
 export default Index;
+=======
+  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16, paddingTop: 8 },
+  header: { fontSize: 22, fontWeight: "700", marginBottom: 8 },
+});
+
+>>>>>>> Stashed changes

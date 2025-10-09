@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 export const apiCall = async (endpoint) => {
   try {
     const response = await fetch(endpoint, {
@@ -12,6 +13,17 @@ export const apiCall = async (endpoint) => {
   } catch (error) {
     console.error(error);
     return null;
+=======
+// app/ApiScripts.js
+
+const API_BASE = (process.env.EXPO_PUBLIC_API_BASE || "http://10.0.2.2:8080").replace(/\/+$/, "");
+
+async function toJson(res) {
+  if (!res.ok) {
+    let msg = res.statusText;
+    try { msg = await res.text(); } catch {}
+    throw new Error(`HTTP ${res.status}: ${msg}`);
+>>>>>>> Stashed changes
   }
 };
 export const callTeams = async () => {
@@ -37,6 +49,7 @@ export const callTeams = async () => {
         logo: team.logo,
       }));
 
+<<<<<<< Updated upstream
     //console.log("teamData:", teamData);
     return teamData;
   } catch (error) {
@@ -85,3 +98,50 @@ export const callGamesByDate = async (startDate, endDate, teamID) => {
     return [];
   }
 };
+=======
+/* Core helpers */
+async function getEvents() {
+  const res = await fetch(`${API_BASE}/api/events`);
+  return toJson(res);
+}
+
+async function getEvent(id) {
+  const res = await fetch(`${API_BASE}/api/events/${id}`);
+  return toJson(res);
+}
+
+async function getEventOdds(id) {
+  const res = await fetch(`${API_BASE}/api/events/${id}/odds`);
+  return toJson(res);
+}
+
+async function placeBet({ userId, eventId, selection, stakeCents }) {
+  const res = await fetch(`${API_BASE}/api/bets`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, eventId, selection, stakeCents }),
+  });
+  return toJson(res);
+}
+
+async function getUserBets(userId) {
+  const res = await fetch(`${API_BASE}/api/users/${userId}/bets`);
+  return toJson(res);
+}
+
+function getBase() { return API_BASE; }
+
+/* 🔧 Compatibility shims for the template */
+async function callTeams() {              // template expects this
+  return getEvents();
+}
+async function callOdds(eventId) {        // if template calls this name
+  return getEventOdds(eventId);
+}
+
+/* Default + named exports */
+const api = { getBase, getEvents, getEvent, getEventOdds, placeBet, getUserBets, callTeams, callOdds };
+export default api;
+export { getBase, getEvents, getEvent, getEventOdds, placeBet, getUserBets, callTeams, callOdds };
+
+>>>>>>> Stashed changes
