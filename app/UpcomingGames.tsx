@@ -1,28 +1,14 @@
 // app/UpcomingGames.tsx
 import React, { useEffect, useState } from "react";
-<<<<<<< Updated upstream
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { callGamesByDate } from "./app/ApiScripts";
-import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../navagation/types";
-=======
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import api from "./ApiScripts";
->>>>>>> Stashed changes
 
 type Event = {
   id: number;
   league: string;
   home_team: string;
   away_team: string;
-  start_time: string; // ISO
+  start_time: string;
   status: string;
 };
 
@@ -32,24 +18,58 @@ export default function UpcomingGames() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const load = async () => {
       setLoading(true);
       setError(null);
+      const base = api.getBase();
+      console.log("API base in app:", base);
+
+      // Timeout guard
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 12000);
+
       try {
-        console.log("API base in app:", api.getBase());
-        const data = await api.getEvents();
-        setEvents(data);
+        // Use the same code as ApiScripts.getEvents, but with extra logging
+        const url = `${base.replace(/\/+$/, "")}/api/events`;
+        console.log("Fetching:", url);
+        const res = await fetch(url, { signal: ctrl.signal });
+
+        console.log("Fetch status:", res.status);
+        const text = await res.text(); // read once
+        console.log("Fetch body (first 200):", text.slice(0, 200));
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${text}`);
+        }
+        const data: Event[] = JSON.parse(text);
+
+        if (!cancelled) setEvents(data);
       } catch (err: any) {
-        console.error("Events fetch failed:", err);
-        setError(err?.message ?? "Failed to fetch events");
+        if (!cancelled) {
+          const msg =
+            err?.name === "AbortError"
+              ? "Request timed out. Check your network and API base."
+              : err?.message ?? "Failed to fetch events";
+          console.error("Events fetch failed:", err);
+          setError(msg);
+        }
       } finally {
-        setLoading(false);
+        clearTimeout(t);
+        if (!cancelled) setLoading(false);
       }
     };
+
     load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  if (loading) return <ActivityIndicator style={styles.loader} size="large" />;
+  if (loading) {
+    return <ActivityIndicator style={styles.loader} size="large" />;
+  }
 
   return (
     <View style={styles.container}>
@@ -80,7 +100,7 @@ export default function UpcomingGames() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, paddingTop: 4 },
   loader: { flex: 1, justifyContent: "center", alignItems: "center" },
   error: { color: "red", marginBottom: 8 },
   empty: { color: "#666" },

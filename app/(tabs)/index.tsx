@@ -1,4 +1,5 @@
 // app/(tabs)/index.tsx
+<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList, Text, Pressable } from "react-native";
 import { getEvents } from "../ApiScripts"; // NEW
@@ -30,14 +31,41 @@ export default function IndexScreen() {
           </Pressable>
         )}
       />
+=======
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import UpcomingGames from "../UpcomingGames"; // <-- Adjust if file path differs
+
+export default function Home() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Upcoming Events</Text>
+      <UpcomingGames />
+>>>>>>> Heroku-Set-Up
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+<<<<<<< HEAD
   container: { flex: 1, padding: 16 },
   title: { fontSize: 22, fontWeight: "700", marginBottom: 8 },
   card: { padding: 12, borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 8, marginBottom: 10 },
   matchup: { fontWeight: "700", marginBottom: 4 },
   meta: { color: "#6b7280" },
 });
+=======
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+});
+
+>>>>>>> Heroku-Set-Up
