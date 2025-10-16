@@ -13,13 +13,15 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(155, 216, 243, 1)",
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 16,
   },
   header: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginBottom: 8,
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#25292e",
+    marginBottom: 16,
+    textAlign: "center",
   },
 });

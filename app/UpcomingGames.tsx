@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import api from "./ApiScripts";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 type Event = {
   id: number;
@@ -76,7 +77,15 @@ export default function UpcomingGames() {
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       {events.length === 0 ? (
-        <Text style={styles.empty}>No upcoming events.</Text>
+        <View style={{ alignItems: "center", marginTop: 32 }}>
+    <Ionicons
+      name="basketball-outline"
+      size={70}
+      color="#00BFFF"
+      style={{ marginBottom: 8 }}
+    />
+        <Text style={styles.empty}>No Upcoming Events</Text>
+        </View>
       ) : (
         <FlatList
           data={events}
@@ -103,7 +112,17 @@ const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 4 },
   loader: { flex: 1, justifyContent: "center", alignItems: "center" },
   error: { color: "red", marginBottom: 8 },
-  empty: { color: "#666" },
+  empty: { 
+    fontSize: 18,
+    textAlign: "center",
+    marginTop: 32,
+    paddingHorizontal: 16,
+    color: "#000BFFF",
+    backgroundColor: "#f0f8ff",
+    borderRadius: 12,
+    paddingVertical: 12,
+    fontWeight: "bold",
+   },
   card: {
     padding: 14,
     borderWidth: 1,

@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
-
+//import { Pressable } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+//import { useState } from "react";
 
 export default function TabLayout() {
   return (
@@ -8,12 +9,15 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: "#ffd33d",
         headerStyle: {
-          backgroundColor: "#25292e",
+          backgroundColor: "#f7f3f3ff",
+          //backgroundColor: "#25292e",
         },
+        headerTitleAlign: "center",
         headerShadowVisible: false,
-        headerTintColor: "#fff",
+        headerTintColor: "#25292e",
         tabBarStyle: {
-          backgroundColor: "#25292e",
+          backgroundColor: "#fff",
+          //backgroundColor: "#25292e",
         },
       }}
     >
@@ -54,6 +58,47 @@ export default function TabLayout() {
               name={
                 focused ? "key" : "key"
               }
+              color={color}
+              size={24}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="logout"
+        options={{
+          title: "Logout",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={
+                focused ? "log-out-outline" : "log-out-outline"
+              }
+              color={color}
+              size={24}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="UpcomingGames"
+        options={{
+          title: "Events",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "calendar" : "calendar-outline"}
+              color={color}
+              size={24}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="favoriteTeams"
+        options={{
+          title: "FavoriteTeams",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "heart" : "heart-outline"}
               color={color}
               size={24}
             />
