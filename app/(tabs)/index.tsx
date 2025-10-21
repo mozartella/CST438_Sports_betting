@@ -1,15 +1,15 @@
 // app/(tabs)/index.tsx
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import UpcomingGames from "../UpcomingGames"; // <-- if UpcomingGames.tsx lives at app/UpcomingGames.tsx
+
 export default function Home() {
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Upcoming Events</Text>
-      <UpcomingGames />
+      <Text style={styles.header}>Welcome to the Home Screen</Text>
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -23,5 +23,5 @@ const styles = StyleSheet.create({
     color: "#25292e",
     marginBottom: 16,
     textAlign: "center",
-  },
+  }
 });
