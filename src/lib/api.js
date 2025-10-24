@@ -1,7 +1,6 @@
 // src/lib/api.js
 import { Platform } from 'react-native';
 
-// Default base URL by platform; env var can override
 const defaultBase =
   Platform.OS === 'android'
     ? 'http://10.0.2.2:8080'   // Android emulator -> host machine
@@ -9,7 +8,7 @@ const defaultBase =
 
 export const API_BASE = process.env.EXPO_PUBLIC_API_BASE || defaultBase;
 
-async function json(res) {
+async function toJson(res) {
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`HTTP ${res.status}: ${text}`);
@@ -17,17 +16,19 @@ async function json(res) {
   return res.json();
 }
 
-export const api = {
-  events: async () => json(await fetch(`${API_BASE}/api/events`)),
-  event: async (id) => json(await fetch(`${API_BASE}/api/events/${id}`)),
-  eventOdds: async (id) => json(await fetch(`${API_BASE}/api/events/${id}/odds`)),
-  placeBet: async ({ userId, eventId, selection, stakeCents }) =>
-    json(
-      await fetch(`${API_BASE}/api/bets`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, eventId, selection, stakeCents })
-      })
-    ),
-  myBets: async (userId) => json(await fetch(`${API_BASE}/api/users/${userId}/bets`)),
+const fetchWithCreds = (url, opts = {}) =>
+  fetch(url, {
+    credentials: 'include',
+    ...opts,
+    headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+  });
+
+export const API = {
+  BASE: API_BASE,
+  LOGIN: `${API_BASE}/oauth2/authorization/github`,
+  LOGOUT: `${API_BASE}/logout`,
+  ME: `${API_BASE}/api/me`,
+
+  // keep/add your other endpoints here as needed
+  events: async () => toJson(await fetchWithCreds(`${API_BASE}/api/events`)),
 };
