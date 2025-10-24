@@ -1,44 +1,53 @@
 // app/(tabs)/logout.tsx
 import React, { useState } from "react";
-import { View, Text, Button, StyleSheet, Linking } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-<<<<<<< Updated upstream
-import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../navagation/types";
-
-// Define the type for navigation in LogoutScreen
-type LogoutScreenNavigationProp = StackNavigationProp<RootStackParamList, "Logout">;
-=======
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { WebView } from "react-native-webview";
 import { API } from "../../src/lib/api";
->>>>>>> Stashed changes
 
 const LogoutScreen = () => {
   const navigation = useNavigation<any>();
-  const [msg, setMsg] = useState("");
+  const [msg, setMsg] = useState<string>("");
+  const [useWebFallback, setUseWebFallback] = useState(false); // hidden WebView when needed
+
+  const finish = async () => {
+    try {
+      await AsyncStorage.clear();
+    } catch {}
+    setMsg("Logged out. Returning to home…");
+    navigation.navigate("index");
+  };
 
   const handleLogout = async () => {
+    setMsg("Logging out…");
     try {
-      // Trigger server-side session logout (we allowed GET /logout in Spring)
-      await Linking.openURL(API.LOGOUT);
+      // Try via fetch; if cookie is visible to fetch, this succeeds
+      await fetch(API.LOGOUT, { method: "GET", credentials: "include" as any });
+      await finish();
+    } catch {
+      // If fetch can't see the cookie (Android quirk), use WebView which shares the cookie jar
+      setMsg("Finalizing logout…");
+      setUseWebFallback(true);
+    }
+  };
 
-      await AsyncStorage.clear();
-      setMsg("Logged out. Returning to home...");
-      // Navigate back to your home/index (same behavior you had)
-      navigation.navigate("index");
-    } catch (error) {
-      console.error("Logout error:", error);
-      setMsg("Failed to logout. Please try again.");
+  // Detect when server redirects back after /logout; then finish
+  const onWebNav = async (event: any) => {
+    const url: string = event?.url || "";
+    if (
+      url === `${API.BASE}/` ||
+      url === `${API.BASE}` ||
+      url.startsWith(`${API.BASE}/api/me`)
+    ) {
+      setUseWebFallback(false);
+      await finish();
     }
   };
 
   return (
     <View style={styles.container}>
-<<<<<<< Updated upstream
-      <Text style={styles.text}>Are you sure you want to log out?</Text>
-      <Button title="Logout" onPress={handleLogout} color="red" />
-=======
       <Ionicons
         name="log-out-outline"
         size={120}
@@ -51,9 +60,22 @@ const LogoutScreen = () => {
       </View>
 
       <Text style={styles.text}>You're About to Sign Out. Ready to Continue?</Text>
-      <Button title="Logout" onPress={handleLogout} color="#FF3B30" />
+      <View style={styles.buttonWrapper}>
+        <Button title="Logout" onPress={handleLogout} color="#FF3B30" />
+      </View>
       {msg ? <Text style={{ marginTop: 12 }}>{msg}</Text> : null}
->>>>>>> Stashed changes
+
+      {/* Hidden WebView fallback: uses same cookie jar as the login WebView */}
+      {useWebFallback && (
+        <View style={{ width: 1, height: 1, overflow: "hidden" }}>
+          <WebView
+            source={{ uri: API.LOGOUT }}
+            onNavigationStateChange={onWebNav}
+            sharedCookiesEnabled
+            thirdPartyCookiesEnabled
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -63,11 +85,54 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "rgba(155, 216, 243, 1)",
+    paddingHorizontal: 16,
+    position: "relative",
+  },
+  watermarkIcon: {
+    position: "absolute",
+    top: "100%",
+    right: "20%",
+  },
+  banner: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 12,
+    marginTop: 20,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  bannerText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#25292e",
+    marginLeft: 12,
   },
   text: {
-    fontSize: 18,
-    marginBottom: 20,
+    fontSize: 20,
+    marginBottom: 24,
+    color: "#25292e",
+    textAlign: "center",
+    fontWeight: "600",
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    width: "80%",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  buttonWrapper: {
+    width: "60%",
+    borderRadius: 8,
+    overflow: "hidden",
   },
 });
 
