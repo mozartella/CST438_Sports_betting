@@ -1,139 +1,133 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-} from "react-native";
-import { callTeams } from "../ApiScripts";
-import { useRoute, RouteProp } from "@react-navigation/native";
-import { RootStackParamList } from "../navagation/types";
-import {
-  addTeamToFavs,
-  removeTeamFromFav,
-  getFavTeamNames,
-  logDatabaseContents,
-} from "../../database/db";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 
-interface Team {
-  id: string;
-  name: string;
-  nickname: string;
-  logo: string;
-}
+type Team = { id: string; name: string; league: string };
 
-const FavoriteTeams = () => {
-  const route = useRoute<RouteProp<RootStackParamList, "favoriteTeams">>();
-  const username = route.params?.username; // Get username from navigation params
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+// ⚾️ Add/trim teams here (sample across leagues)
+const ALL_TEAMS: Team[] = [
+  // NBA
+  { id: "NBA-LAL", name: "Los Angeles Lakers", league: "NBA" },
+  { id: "NBA-GSW", name: "Golden State Warriors", league: "NBA" },
+  { id: "NBA-BOS", name: "Boston Celtics", league: "NBA" },
+  { id: "NBA-NYK", name: "New York Knicks", league: "NBA" },
+  // NFL
+  { id: "NFL-SF", name: "San Francisco 49ers", league: "NFL" },
+  { id: "NFL-KC", name: "Kansas City Chiefs", league: "NFL" },
+  { id: "NFL-DAL", name: "Dallas Cowboys", league: "NFL" },
+  // MLB
+  { id: "MLB-LAD", name: "Los Angeles Dodgers", league: "MLB" },
+  { id: "MLB-NYY", name: "New York Yankees", league: "MLB" },
+  // MLS (example)
+  { id: "MLS-LAFC", name: "Los Angeles FC", league: "MLS" },
+];
 
+const STORAGE_KEY = "favoriteTeamIds:v1";
+
+export default function FavoriteTeamsScreen() {
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
+
+  // Load saved favorites
   useEffect(() => {
-    const initialize = async () => {
-      if (!username) {
-        console.error("No username received via navigation");
-        return;
-      }
-
-      setLoading(true);
-
+    (async () => {
       try {
-        const favTeams = await getFavTeamNames(username);
-        setSelectedTeams(favTeams || []);
+        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        if (raw) setFavoriteIds(new Set(JSON.parse(raw)));
+      } catch {}
+    })();
+  }, []);
 
-        process.env.RAPIDAPI_KEY = "f48a5921f5msh580809ba8c9e6cfp181a8ajsn545d715d6844";
-        const teamData = await callTeams();
+  // Persist on change
+  useEffect(() => {
+    (async () => {
+      try {
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([...favoriteIds]));
+      } catch {}
+    })();
+  }, [favoriteIds]);
 
-        if (teamData && teamData.length > 0) {
-          setTeams(teamData);
-        } else {
-          console.error("No teams received from API.");
-        }
-      } catch (error) {
-        console.error("Error fetching teams:", error);
-      }
+  const toggleFavorite = useCallback((id: string) => {
+    setFavoriteIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
 
-      setLoading(false);
-    };
+  // Sort: favorites first (alphabetical within groups)
+  const data = useMemo(() => {
+    const arr = [...ALL_TEAMS];
+    arr.sort((a, b) => {
+      const aFav = favoriteIds.has(a.id) ? 1 : 0;
+      const bFav = favoriteIds.has(b.id) ? 1 : 0;
+      if (aFav !== bFav) return bFav - aFav; // favorites to top
+      // then by league, then name (nice & stable)
+      if (a.league !== b.league) return a.league.localeCompare(b.league);
+      return a.name.localeCompare(b.name);
+    });
+    return arr;
+  }, [favoriteIds]);
 
-    initialize();
-  }, [username]);
+  const renderItem = ({ item }: { item: Team }) => {
+    const isFav = favoriteIds.has(item.id);
+    return (
+      <View style={styles.row}>
+        <View style={styles.textWrap}>
+          <Text style={styles.team}>{item.name}</Text>
+          <Text style={styles.league}>{item.league}</Text>
+        </View>
 
-  const toggleTeamSelection = async (team_name: string) => {
-    if (!username) return;
-
-    let updatedTeams = [...selectedTeams];
-
-    if (updatedTeams.includes(team_name)) {
-      await removeTeamFromFav(username, team_name);
-      updatedTeams = updatedTeams.filter((name) => name !== team_name);
-    } else {
-      await addTeamToFavs(username, team_name);
-      updatedTeams.push(team_name);
-    }
-
-    setSelectedTeams(updatedTeams);
-    await logDatabaseContents();
+        <TouchableOpacity
+          onPress={() => toggleFavorite(item.id)}
+          accessibilityRole="button"
+          accessibilityLabel={isFav ? "Unfavorite" : "Favorite"}
+          style={styles.heartBtn}
+        >
+          <Ionicons
+            name={isFav ? "heart" : "heart-outline"}
+            size={24}
+            // no custom colors needed; platform default is fine
+          />
+        </TouchableOpacity>
+      </View>
+    );
   };
-
-  if (loading) {
-    return <ActivityIndicator style={styles.loader} size="large" color="#0000ff" />;
-  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Select Your Favorite Teams</Text>
-      {teams.length === 0 ? (
-        <Text style={styles.errorText}>No teams available. Check API Key.</Text>
-      ) : (
-        <FlatList
-          data={teams}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.teamItem,
-                selectedTeams.includes(item.name) ? styles.selectedTeam : {},
-              ]}
-              onPress={() => toggleTeamSelection(item.name)}
-            >
-              <View style={styles.teamContainer}>
-                <Image source={{ uri: item.logo }} style={styles.logo} />
-                <Text style={styles.teamText}>{item.name}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
+      <Text style={styles.title}>Favorite Teams</Text>
+
+      {Array.from(favoriteIds).length > 0 && (
+        <Text style={styles.helper}>Your favorites are pinned at the top.</Text>
       )}
+
+      <FlatList
+        data={data}
+        keyExtractor={(t) => t.id}
+        renderItem={renderItem}
+        ItemSeparatorComponent={() => <View style={styles.sep} />}
+        contentContainerStyle={styles.listPad}
+      />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
-  loader: { flex: 1, justifyContent: "center", alignItems: "center" },
-  errorText: { fontSize: 16, color: "red", textAlign: "center" },
-  teamItem: {
-    padding: 15,
-    marginBottom: 5,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 5,
+  container: { flex: 1, paddingTop: 16 },
+  title: { fontSize: 22, fontWeight: "700", paddingHorizontal: 16, marginBottom: 6 },
+  helper: { fontSize: 13, opacity: 0.6, paddingHorizontal: 16, marginBottom: 8 },
+  listPad: { paddingHorizontal: 8, paddingBottom: 24 },
+  row: {
     flexDirection: "row",
     alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 12,
   },
-  teamContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logo: { width: 40, height: 40, marginRight: 10, resizeMode: "contain" },
-  selectedTeam: { backgroundColor: "#87CEFA" },
-  teamText: { fontSize: 18 },
+  sep: { height: 1, backgroundColor: "rgba(0,0,0,0.06)", marginLeft: 16 },
+  textWrap: { flex: 1, paddingRight: 8 },
+  team: { fontSize: 16, fontWeight: "600" },
+  league: { fontSize: 12, opacity: 0.6, marginTop: 2 },
+  heartBtn: { padding: 8, borderRadius: 999 },
 });
-
-export default FavoriteTeams;

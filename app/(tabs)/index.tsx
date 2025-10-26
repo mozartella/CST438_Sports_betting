@@ -11,13 +11,12 @@ import {
 import UpcomingGames from "../UpcomingGames";
 
 export default function Home() {
-  // We'll render all static sections above the FlatList using ListHeaderComponent
   return (
     <FlatList
-      data={[{ key: "header" }]} // Dummy data to render FlatList
-      renderItem={null} // No need to render items; UpcomingGames will handle its list
+      data={[{ key: "header" }]}
+      renderItem={null}
       ListHeaderComponent={
-        <View>
+        <View style={styles.container}>
           {/* HEADER */}
           <View style={styles.headerContainer}>
             <Text style={styles.title}>🏆 BetSmart</Text>
@@ -52,6 +51,12 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "rgba(155, 216, 243, 1)",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
   headerContainer: {
     paddingTop: 50,
     paddingBottom: 16,
@@ -114,3 +119,4 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
+
