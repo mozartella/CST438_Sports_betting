@@ -1,71 +1,116 @@
 // app/(tabs)/index.tsx
-<<<<<<< HEAD
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Text, Pressable } from "react-native";
-import { getEvents } from "../ApiScripts"; // NEW
-// ... keep your other imports
-
-export default function IndexScreen() {
-  const [events, setEvents] = useState<any[]>([]);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    getEvents()
-      .then(data => mounted && setEvents(data))
-      .catch(e => mounted && setError(e));
-    return () => { mounted = false; };
-  }, []);
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Upcoming Events</Text>
-      {error && <Text style={{ color: "red" }}>{String(error.message || error)}</Text>}
-      <FlatList
-        data={events}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <Pressable style={styles.card} onPress={() => {/* navigate to a detail/view */}}>
-            <Text style={styles.matchup}>{item.league}: {item.home_team} vs {item.away_team}</Text>
-            <Text style={styles.meta}>{new Date(item.start_time).toLocaleString()} • {item.status}</Text>
-          </Pressable>
-        )}
-      />
-=======
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import UpcomingGames from "../UpcomingGames"; // <-- Adjust if file path differs
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
+import UpcomingGames from "../UpcomingGames";
 
 export default function Home() {
+  // We'll render all static sections above the FlatList using ListHeaderComponent
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Upcoming Events</Text>
-      <UpcomingGames />
->>>>>>> Heroku-Set-Up
-    </View>
+    <FlatList
+      data={[{ key: "header" }]} // Dummy data to render FlatList
+      renderItem={null} // No need to render items; UpcomingGames will handle its list
+      ListHeaderComponent={
+        <View>
+          {/* HEADER */}
+          <View style={styles.headerContainer}>
+            <Text style={styles.title}>🏆 BetSmart</Text>
+            <Text style={styles.subtitle}>Your Sports Betting Companion</Text>
+          </View>
+
+          {/* BANNER */}
+          <View style={styles.banner}>
+            <Image
+              source={{
+                uri: "https://images.unsplash.com/photo-1521412644187-c49fa049e84d",
+              }}
+              style={styles.bannerImage}
+            />
+            <View style={styles.bannerOverlay}>
+              <Text style={styles.bannerText}>Big Match Weekend!</Text>
+              <TouchableOpacity style={styles.betNowButton}>
+                <Text style={styles.betNowText}>Place Bets</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* UPCOMING GAMES SECTION */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeader}>Upcoming Games</Text>
+          </View>
+          <UpcomingGames />
+        </View>
+      }
+    />
   );
 }
 
 const styles = StyleSheet.create({
-<<<<<<< HEAD
-  container: { flex: 1, padding: 16 },
-  title: { fontSize: 22, fontWeight: "700", marginBottom: 8 },
-  card: { padding: 12, borderWidth: 1, borderColor: "#e5e7eb", borderRadius: 8, marginBottom: 10 },
-  matchup: { fontWeight: "700", marginBottom: 4 },
-  meta: { color: "#6b7280" },
-});
-=======
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingTop: 8,
+  headerContainer: {
+    paddingTop: 50,
+    paddingBottom: 16,
+    backgroundColor: "#1E1E1E",
+    alignItems: "center",
   },
-  header: {
-    fontSize: 22,
-    fontWeight: "700",
+  title: {
+    fontSize: 28,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  subtitle: {
+    color: "#B0B0B0",
+    marginTop: 4,
+  },
+  banner: {
+    marginHorizontal: 16,
+    marginTop: 20,
+    borderRadius: 16,
+    overflow: "hidden",
+    position: "relative",
+  },
+  bannerImage: {
+    width: "100%",
+    height: 160,
+    borderRadius: 16,
+  },
+  bannerOverlay: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    padding: 12,
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  bannerText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  betNowButton: {
+    backgroundColor: "#FFD700",
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    marginTop: 8,
+    alignSelf: "flex-start",
+  },
+  betNowText: {
+    color: "#000",
+    fontWeight: "600",
+  },
+  section: {
+    marginTop: 24,
+    paddingHorizontal: 16,
+  },
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#222",
     marginBottom: 8,
   },
 });
-
->>>>>>> Heroku-Set-Up
